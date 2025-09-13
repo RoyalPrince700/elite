@@ -1,5 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import CheckIcon from "../assets/check.svg";
 import BeforeAfterComparison from "./BeforeAfterComparison";
 
@@ -87,6 +89,19 @@ const pricingTiers = [
 ];
 
 export const Pricing = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handlePricingClick = () => {
+    if (user) {
+      // User is authenticated, go to pricing page
+      navigate('/pricing');
+    } else {
+      // User is not authenticated, go to auth page
+      navigate('/auth');
+    }
+  };
+
   return (
     <section className="py-24 bg-blue-50">
       <div className="container mx-auto px-4">
@@ -222,6 +237,7 @@ export const Pricing = () => {
                 </div>
                 
                 <button
+                  onClick={handlePricingClick}
                   className={twMerge(
                     "w-full mt-4 py-3 rounded-lg font-semibold transition-colors",
                     inverse
@@ -229,7 +245,7 @@ export const Pricing = () => {
                       : "bg-blue-600 text-white hover:bg-blue-700"
                   )}
                 >
-                  Sign up now
+                  {user ? 'Get Started' : 'Sign up now'}
                 </button>
                 
                 <ul className="flex flex-col gap-4 mt-8">

@@ -1,0 +1,57 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Ping Backend
+      run: |
+        echo "Pinging backend at https://elite-pnpr.onrender.com"
+
+        # Try to ping the main endpoint
+        if curl -f -s --max-time 30 "https://elite-pnpr.onrender.com" > /dev/null; then
+          echo "✅ Successfully pinged main endpoint"
+        else
+          echo "❌ Failed to ping main endpoint, trying alternative endpoints..."
+
+          # Try some common endpoints that might be available
+          endpoints=(
+            "/health"
+            "/api/health"
+            "/status"
+            "/ping"
+            "/"
+          )
+
+          success=false
+          for endpoint in "${endpoints[@]}"; do
+            if curl -f -s --max-time 30 "https://elite-pnpr.onrender.com$endpoint" > /dev/null; then
+              echo "✅ Successfully pinged $endpoint"
+              success=true
+              break
+            fi
+          done
+
+          if [ "$success" = false ]; then
+            echo "❌ All ping attempts failed"
+            exit 1
+          fi
+        fi
+
+    - name: Log Success
+      if: success()
+      run: |
+        echo "Backend keep-alive ping completed successfully at $(date)"
+
+    - name: Log Failure
+      if: failure()
+      run: |
+        echo "Backend keep-alive ping failed at $(date)"
+        echo "This might indicate the backend is down or unreachable"

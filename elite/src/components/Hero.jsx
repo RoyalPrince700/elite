@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { FiArrowRight, FiCheck, FiAward, FiClock, FiStar } from "react-icons/fi";
 import BeforeAfterComparison from "./BeforeAfterComparison";
 
@@ -8,6 +9,16 @@ import beforeImage from "../assets/before.jpg";
 import afterImage from "../assets/after.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate('/pricing');
+  };
+
+  const handleViewPortfolio = () => {
+    navigate('/portfolio');
+  };
+
   return (
     <section className="pt-20 pb-20 md:pb-32 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
       {/* Background Decorative Elements */}
@@ -53,10 +64,16 @@ const Hero = () => {
       transition={{ duration: 0.5, delay: 0.3 }}
       className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
     >
-      <button className="bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-lg">
+      <button
+        onClick={handleGetStarted}
+        className="bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-lg"
+      >
         Get Started Now <FiArrowRight />
       </button>
-      <button className="border border-blue-700 text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+      <button
+        onClick={handleViewPortfolio}
+        className="border border-blue-700 text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+      >
         View Portfolio <FiArrowRight />
       </button>
     </motion.div>
@@ -132,10 +149,16 @@ const Hero = () => {
           </motion.h1>
 
 
-            <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-lg">
+            <button
+              onClick={handleGetStarted}
+              className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-lg"
+            >
               Get Started Now <FiArrowRight />
             </button>
-            <button className="border border-blue-700 text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+            <button
+              onClick={handleViewPortfolio}
+              className="border border-blue-700 text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+            >
               View Portfolio <FiArrowRight />
             </button>
           </motion.div> 
