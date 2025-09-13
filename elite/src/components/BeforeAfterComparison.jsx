@@ -28,27 +28,29 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, altText }) => {
   }, []);
 
   const handleMouseMove = useCallback((e) => {
-    e.preventDefault();
     if (!isDragging) return;
 
+    e.preventDefault();
     // Update immediately without animation frame delay
     updateSliderPosition(e.clientX);
   }, [isDragging, updateSliderPosition]);
 
   const handleTouchMove = useCallback((e) => {
-    e.preventDefault();
     if (!isDragging) return;
 
+    e.preventDefault();
     // Update immediately without animation frame delay
     updateSliderPosition(e.touches[0].clientX);
   }, [isDragging, updateSliderPosition]);
 
   const handleMouseDown = useCallback((e) => {
+    // Only prevent default when actually starting to drag
     e.preventDefault();
     setIsDragging(true);
   }, []);
 
   const handleTouchStart = useCallback((e) => {
+    // Only prevent default when actually starting to drag
     e.preventDefault();
     setIsDragging(true);
   }, []);
@@ -103,7 +105,7 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, altText }) => {
       className="relative w-full max-w-full h-[calc(100vw*9/7)] sm:h-[calc(100vw*9/7)] md:h-96 lg:h-[450px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white z-10 select-none"
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
-      style={{ touchAction: 'none' }}
+      style={{ touchAction: isDragging ? 'none' : 'auto' }}
     >
       {/* After Image */}
       <img

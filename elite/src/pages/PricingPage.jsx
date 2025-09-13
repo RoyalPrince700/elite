@@ -22,7 +22,7 @@ import SubscriptionPlansSection from '../components/pricing/SubscriptionPlansSec
 import PayPerImageSection from '../components/pricing/PayPerImageSection';
 import PricingFAQ from '../components/pricing/PricingFAQ';
 import PricingCTA from '../components/pricing/PricingCTA';
-import PricingFooter from '../components/pricing/PricingFooter';
+import UserChat from '../components/chat/UserChat';
 
 const PricingPage = () => {
   const { user } = useAuth();
@@ -338,7 +338,8 @@ const PricingPage = () => {
 
         {/* Subscription Plans */}
         {activeTab === 'subscription' && (
-          <SubscriptionPlansSection
+          <div id="pricing-plans">
+            <SubscriptionPlansSection
             fadeIn={fadeIn}
             staggerChildren={staggerChildren}
             subscriptionPlans={subscriptionPlans}
@@ -353,6 +354,7 @@ const PricingPage = () => {
             getPlanImages={getPlanImages}
             handleGetStarted={handleGetStarted}
           />
+          </div>
         )}
 
         {/* Pay Per Image Services */}
@@ -381,9 +383,6 @@ const PricingPage = () => {
         <PricingCTA fadeIn={fadeIn} />
       </main>
 
-      {/* Footer */}
-      <PricingFooter />
-
       {/* Subscription Request Form Modal */}
       {showForm && selectedPlan && (
         <SubscriptionRequestForm
@@ -403,6 +402,9 @@ const PricingPage = () => {
           onSuccess={handlePayPerImageFormSuccess}
         />
       )}
+
+      {/* User Chat */}
+      <UserChat />
     </div>
   );
 };

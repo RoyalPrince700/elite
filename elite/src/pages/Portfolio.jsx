@@ -15,8 +15,8 @@ import dBefore from '../assets/d-before.jpg';
 import dAfter from '../assets/d-after.jpg';
 import eBefore from '../assets/e-before.webp';
 import eAfter from '../assets/e-after.webp';
-import fBefore from '../assets/f-before.jpg';
-import fAfter from '../assets/f-after.jpg';
+import wBefore from '../assets/w-before.jpg';
+import wAfter from '../assets/w-after.jpg';
 import gBefore from '../assets/g-before.webp';
 import gAfter from '../assets/g-after.webp';
 import hBefore from '../assets/h-before.jpg';
@@ -29,12 +29,18 @@ import kBefore from '../assets/a-before.jpg';
 import kAfter from '../assets/a-after.jpg';
 import lBefore from '../assets/l-before.jpg';
 import lAfter from '../assets/l-after.jpg';
+import mBefore from '../assets/m-before.jpg';
+import mAfter from '../assets/m-after.jpg';
+import rBefore from '../assets/r-before.jpg';
+import rAfter from '../assets/r-after.jpg';
+import tBefore from '../assets/t-before.jpg';
+import tAfter from '../assets/t-after.jpg';
 
 // Portfolio showcase data for carousel
 const portfolioShowcase = [
   { before: dBefore, after: dAfter, title: "Product Photography", category: "E-commerce" },
   { before: eBefore, after: eAfter, title: "Creative Retouching", category: "Artistic" },
-  { before: fBefore, after: fAfter, title: "Wedding Photography", category: "Events" }
+  { before: wBefore, after: wAfter, title: "Wedding Photography", category: "Events" }
 ];
 
 const Portfolio = () => {
@@ -102,16 +108,16 @@ const Portfolio = () => {
     },
     {
       id: 5,
-      beforeImage: eBefore,
-      afterImage: eAfter,
-      title: "Product Photography",
+      beforeImage: tBefore,
+      afterImage: tAfter,
+      title: "Product Retouching",
       category: "E-commerce",
       description: "Product image with background removal and shadow enhancement."
     },
     {
       id: 6,
-      beforeImage: fBefore,
-      afterImage: fAfter,
+      beforeImage: wBefore,
+      afterImage: wAfter,
       title: "Wedding Photography",
       category: "Event",
       description: "Bridal portrait with delicate skin retouching and color correction."
@@ -136,9 +142,9 @@ const Portfolio = () => {
       id: 9,
       beforeImage: iBefore,
       afterImage: iAfter,
-      title: "Real Estate",
-      category: "Property",
-      description: "Interior photography with exposure correction and detail enhancement."
+      title: "Face Retouching",
+      category: "Beauty",
+      description: "Professional face retouching with skin smoothing and feature enhancement."
     },
     {
       id: 10,
@@ -150,19 +156,19 @@ const Portfolio = () => {
     },
     {
       id: 11,
-      beforeImage: kBefore,
-      afterImage: kAfter,
-      title: "Food Photography",
-      category: "Culinary",
-      description: "Food product with appetizing color enhancement and presentation polish."
+      beforeImage: mBefore,
+      afterImage: mAfter,
+      title: "Male Retouching",
+      category: "Portrait",
+      description: "Professional male portrait with advanced skin retouching and facial enhancement."
     },
     {
       id: 12,
-      beforeImage: lBefore,
-      afterImage: lAfter,
-      title: "Luxury Product",
-      category: "Premium",
-      description: "High-end product photography with meticulous detail refinement."
+      beforeImage: rBefore,
+      afterImage: rAfter,
+      title: "Hair Retouching",
+      category: "Beauty",
+      description: "Professional hair retouching with strand-by-strand detail enhancement and color correction."
     }
   ];
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import LOGO from "../assets/elite-white.png";
 
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaYoutube, FaPinterestP } from 'react-icons/fa'; // Import social media icons
+import { FaInstagram, FaYoutube } from 'react-icons/fa'; // Import social media icons
 
 export const Footer = () => {
   return (
@@ -19,16 +19,10 @@ export const Footer = () => {
               Fast, affordable, and guaranteed satisfaction for photographers and brands worldwide.
             </p>
             <div className="flex gap-4">
-              <a href="#" aria-label="Facebook" className="text-blue-300 hover:text-white transition-colors">
-                <FaFacebookF className="w-5 h-5" />
-              </a>
-              <a href="#" aria-label="Instagram" className="text-blue-300 hover:text-white transition-colors">
+              <a href="https://www.instagram.com/elite.retoucher?igsh=NGxlaGRjMTRmeGo4" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-blue-300 hover:text-white transition-colors">
                 <FaInstagram className="w-5 h-5" />
               </a>
-              <a href="#" aria-label="LinkedIn" className="text-blue-300 hover:text-white transition-colors">
-                <FaLinkedinIn className="w-5 h-5" />
-              </a>
-              <a href="#" aria-label="YouTube" className="text-blue-300 hover:text-white transition-colors">
+              <a href="https://youtube.com/@eliteretoucher?si=iFM8P3MAyx1C3xgc" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-blue-300 hover:text-white transition-colors">
                 <FaYoutube className="w-5 h-5" />
               </a>
             </div>
@@ -79,11 +73,6 @@ export const Footer = () => {
             <p className="text-blue-200 text-sm">
               © 2023 EliteRetoucher. Professional photo retouching services.
             </p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <Link to="/auth" className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
-                Get Started
-              </Link>
-            </div>
           </div>
         </div>
       </div>

@@ -168,10 +168,10 @@ const About = () => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="max-w-4xl mx-auto text-center">
               <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
                 <h2 className="text-4xl font-bold text-blue-900 mb-6">Our Story</h2>
@@ -199,7 +199,7 @@ const About = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
-                  className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-amber-50 rounded-2xl border-l-4 border-blue-500"
+                  className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-amber-50 rounded-2xl border-l-4 border-blue-500 max-w-2xl mx-auto"
                 >
                   <h3 className="text-xl font-bold text-blue-900 mb-3">Our Mission</h3>
                   <p className="text-gray-700">
@@ -207,57 +207,6 @@ const About = () => {
                     that enhance their vision and elevate their work to new heights of professionalism.
                   </p>
                 </motion.div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative"
-              >
-                <div className="relative">
-                  <img
-                    src="/api/placeholder/600/400"
-                    alt="EliteRetoucher Team"
-                    className="w-full h-96 object-cover rounded-3xl shadow-2xl"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl"></div>
-
-                  {/* Floating Achievement Cards */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-gray-900">99.8%</div>
-                        <div className="text-sm text-gray-500">On-time delivery</div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.7 }}
-                    className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-4 shadow-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Award className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-gray-900">ISO 9001</div>
-                        <div className="text-sm text-gray-500">Certified</div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
               </motion.div>
             </div>
           </div>

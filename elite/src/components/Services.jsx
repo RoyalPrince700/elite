@@ -6,12 +6,12 @@ import { useNavigate } from "react-router-dom";
 import BeforeAfterComparison from "./BeforeAfterComparison";
 
 // Import before/after images for carousel
-import aBefore from "../assets/a-before.jpg";
-import aAfter from "../assets/a-after.jpg";
+import aBefore from "../assets/n-before.jpg";
+import aAfter from "../assets/n-after.jpg";
 import bBefore from "../assets/b-before.jpg";
 import bAfter from "../assets/b-after.jpg";
-import cBefore from "../assets/c-before.jpg";
-import cAfter from "../assets/c-after.jpg";
+import cBefore from "../assets/i-before.jpg";
+import cAfter from "../assets/i-after.jpg";
 import dBefore from "../assets/d-before.jpg";
 import dAfter from "../assets/d-after.jpg";
 import eBefore from "../assets/e-before.webp";

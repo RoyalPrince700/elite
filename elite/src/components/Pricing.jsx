@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +7,8 @@ import CheckIcon from "../assets/check.svg";
 import BeforeAfterComparison from "./BeforeAfterComparison";
 
 // Import before/after images for pricing tiers
-import aBefore from "../assets/j-before.jpg";
-import aAfter from "../assets/j-after.jpg";
+import aBefore from "../assets/p-before.jpg";
+import aAfter from "../assets/p-after.jpg";
 import bBefore from "../assets/k-before.jpg";
 import bAfter from "../assets/k-after.jpg";
 import cBefore from "../assets/b-before.jpg";
@@ -17,7 +18,9 @@ const pricingTiers = [
   {
     title: "Silver Plan",
     monthlyPrice: 97,
+    monthlyPriceNGN: 90000,
     images: "20 images",
+    imagesNGN: "30 images",
     audience: "Freelancers, new photographers",
     description: "Entry-level option to try the service.",
     popular: false,
@@ -31,16 +34,26 @@ const pricingTiers = [
       "Commercial usage rights",
       "Standard support"
     ],
+    featuresNGN: [
+      "Up to 20 Basic, 5 Pro, 5 High-End",
+      "Commercial usage rights",
+      "Standard support"
+    ],
     details: {
       retailValue: 170,
+      retailValueNGN: 150000,
       savings: 73,
-      effectiveRate: 4.85
+      savingsNGN: 60000,
+      effectiveRate: 4.85,
+      effectiveRateNGN: 3000
     }
   },
   {
     title: "Gold Plan",
     monthlyPrice: 197,
+    monthlyPriceNGN: 120000,
     images: "60 images",
+    imagesNGN: "60 images",
     audience: "Busy portrait & fashion photographers",
     description: "Highlight as Best Value.",
     popular: true,
@@ -55,16 +68,27 @@ const pricingTiers = [
       "Priority chat support",
       "Mix & match across styles"
     ],
+    featuresNGN: [
+      "Up to 30 Basic, 20 Pro, 10 High-End",
+      "Commercial usage rights",
+      "Priority chat support",
+      "Mix & match across styles"
+    ],
     details: {
       retailValue: 500,
+      retailValueNGN: 250000,
       savings: 303,
-      effectiveRate: 3.28
+      savingsNGN: 130000,
+      effectiveRate: 3.28,
+      effectiveRateNGN: 2000
     }
   },
   {
     title: "Diamond Plan",
     monthlyPrice: 397,
+    monthlyPriceNGN: 200000,
     images: "150 images",
+    imagesNGN: "150 images",
     audience: "Brands, agencies, studios",
     description: "High-volume plan, premium option.",
     popular: false,
@@ -80,10 +104,20 @@ const pricingTiers = [
       "Dedicated account manager",
       "Mix & match across styles"
     ],
+    featuresNGN: [
+      "Up to 70 Basic, 60 Pro, 20 High-End",
+      "Commercial usage rights",
+      "Priority delivery",
+      "Dedicated account manager",
+      "Mix & match across styles"
+    ],
     details: {
       retailValue: 1275,
+      retailValueNGN: 400000,
       savings: 878,
-      effectiveRate: 2.65
+      savingsNGN: 200000,
+      effectiveRate: 2.65,
+      effectiveRateNGN: 1333.33
     }
   },
 ];
@@ -91,6 +125,7 @@ const pricingTiers = [
 export const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [currency, setCurrency] = useState('USD'); // 'USD' or 'NGN'
 
   const handlePricingClick = () => {
     if (user) {
@@ -117,7 +152,7 @@ export const Pricing = () => {
         <div className="flex flex-col gap-8 items-center mt-16 lg:flex-row lg:items-stretch lg:justify-center">
           {pricingTiers.map(
             (
-              { title, monthlyPrice, images, audience, description, buttonText, popular, inverse, features, details, beforeImage, afterImage },
+              { title, monthlyPrice, monthlyPriceNGN, images, imagesNGN, audience, description, buttonText, popular, inverse, features, featuresNGN, details, beforeImage, afterImage },
               index
             ) => (
               <div key={index} className="space-y-6">
@@ -154,12 +189,19 @@ export const Pricing = () => {
                   boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
                 }}
                 className={twMerge(
-                  "rounded-2xl p-8 w-full max-w-sm shadow-lg transition-all duration-300 hover:shadow-xl flex flex-col",
+                  "rounded-2xl p-8 w-full max-w-sm shadow-lg transition-all duration-300 hover:shadow-xl flex flex-col relative",
                   inverse
                     ? "bg-gradient-to-br from-blue-600 to-blue-800 text-white border-2 border-blue-500"
                     : "bg-white text-blue-900 border border-blue-200"
                 )}
               >
+                {popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      Most Popular
+                    </div>
+                  </div>
+                )}
                 <div className="flex justify-between items-start mb-2">
                   <h3
                     className={twMerge(
@@ -169,24 +211,23 @@ export const Pricing = () => {
                   >
                     {title}
                   </h3>
-                  {popular && (
-                    <div className="inline-flex text-sm px-4 py-1.5 rounded-xl bg-blue-100 border border-blue-300">
-                      <motion.span
-                        animate={{
-                          backgroundPositionX: "100%",
-                        }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                          repeatType: "loop",
-                        }}
-                        className="bg-[linear-gradient(to_right,#3B82F6,#60A5FA,#93C5FD,#3B82F6)] [background-size:200%] text-transparent bg-clip-text font-medium"
-                      >
-                        Most Popular
-                      </motion.span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrency(currency === 'USD' ? 'NGN' : 'USD')}
+                      className={twMerge(
+                        "px-3 py-1.5 text-sm font-medium rounded-lg border transition-all duration-200 flex items-center gap-1",
+                        inverse
+                          ? "bg-white text-blue-700 border-white hover:bg-blue-50"
+                          : currency === 'USD'
+                            ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                            : "bg-green-600 text-white border-green-600 hover:bg-green-700"
+                      )}
+                    >
+                      <span>{currency}</span>
+                      <span className="text-xs">↔</span>
+                      <span>{currency === 'USD' ? 'NGN' : 'USD'}</span>
+                    </button>
+                  </div>
                 </div>
                 
                 <p className={twMerge(
@@ -205,7 +246,8 @@ export const Pricing = () => {
 
                 <div className="flex items-baseline gap-1 mt-2">
                   <span className="text-5xl font-bold tracking-tighter">
-                    ${monthlyPrice}
+                    {currency === 'USD' ? '$' : '₦'}
+                    {currency === 'USD' ? monthlyPrice : monthlyPriceNGN.toLocaleString()}
                   </span>
                   <span className={twMerge(
                     "tracking-tight font-medium",
@@ -219,7 +261,7 @@ export const Pricing = () => {
                   "text-lg font-semibold mt-2 mb-6",
                   inverse ? "text-white" : "text-blue-800"
                 )}>
-                  {images}
+                  {currency === 'USD' ? images : imagesNGN}
                 </div>
                 
                 <div className={twMerge(
@@ -228,11 +270,17 @@ export const Pricing = () => {
                 )}>
                   <div className="flex justify-between">
                     <span>Retail value:</span>
-                    <span className="font-semibold">${details.retailValue}</span>
+                    <span className="font-semibold">
+                      {currency === 'USD' ? '$' : '₦'}
+                      {currency === 'USD' ? details.retailValue : details.retailValueNGN.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between mt-1">
                     <span>You save:</span>
-                    <span className="font-semibold">${details.savings}</span>
+                    <span className="font-semibold">
+                      {currency === 'USD' ? '$' : '₦'}
+                      {currency === 'USD' ? details.savings : details.savingsNGN.toLocaleString()}
+                    </span>
                   </div>
                 </div>
                 
@@ -249,7 +297,7 @@ export const Pricing = () => {
                 </button>
                 
                 <ul className="flex flex-col gap-4 mt-8">
-                  {features.map((feature, idx) => (
+                  {(currency === 'USD' ? features : featuresNGN).map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className={twMerge(
                         "p-1 rounded-full mt-1 flex-shrink-0",
