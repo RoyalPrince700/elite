@@ -43,15 +43,17 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, altText }) => {
     updateSliderPosition(e.touches[0].clientX);
   }, [isDragging, updateSliderPosition]);
 
-  const handleMouseDown = useCallback((e) => {
-    // Only prevent default when actually starting to drag
+  const handleSliderMouseDown = useCallback((e) => {
+    // Only allow dragging when clicking on the slider
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
   }, []);
 
-  const handleTouchStart = useCallback((e) => {
-    // Only prevent default when actually starting to drag
+  const handleSliderTouchStart = useCallback((e) => {
+    // Only allow dragging when touching the slider
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
   }, []);
 
@@ -103,8 +105,6 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, altText }) => {
     <div
       ref={containerRef}
       className="relative w-full max-w-full h-[calc(100vw*9/7)] sm:h-[calc(100vw*9/7)] md:h-96 lg:h-[450px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white z-10 select-none"
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
       style={{ touchAction: isDragging ? 'none' : 'auto' }}
     >
       {/* After Image */}
@@ -140,6 +140,8 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, altText }) => {
           left: `${positionRef.current}%`,
           willChange: isDragging ? 'left' : 'auto'
         }}
+        onMouseDown={handleSliderMouseDown}
+        onTouchStart={handleSliderTouchStart}
       >
         <div
           className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white shadow-xl flex items-center justify-center border-2 transition-all duration-200 ${
@@ -170,7 +172,7 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, altText }) => {
             ? "text-blue-600 bg-white/95 shadow-lg scale-105"
             : "text-white bg-black/60 hover:bg-black/70"
         }`}>
-          {isDragging ? "Dragging..." : "Drag to compare"}
+          {isDragging ? "Dragging..." : "Drag the slider to compare"}
         </p>
       </div>
     </div>
