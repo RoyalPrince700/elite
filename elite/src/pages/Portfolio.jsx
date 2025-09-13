@@ -110,7 +110,7 @@ const Portfolio = () => {
       id: 5,
       beforeImage: tBefore,
       afterImage: tAfter,
-      title: "Product Retouching",
+      title: "Creative Retouching",
       category: "E-commerce",
       description: "Product image with background removal and shadow enhancement."
     },
@@ -134,7 +134,7 @@ const Portfolio = () => {
       id: 8,
       beforeImage: hBefore,
       afterImage: hAfter,
-      title: "Family Portrait",
+      title: "Pro Retouching",
       category: "Personal",
       description: "Group family photo with natural skin enhancement and color balancing."
     },

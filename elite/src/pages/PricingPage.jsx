@@ -50,6 +50,11 @@ const PricingPage = () => {
         { type: 'Basic', count: 20 },
         { type: 'Pro', count: 5 },
         { type: 'Highend', count: 5 }
+      ],
+      getBreakdown: (billingCycle) => [
+        { type: 'Basic', count: billingCycle === 'annual' ? 240 : 20 },
+        { type: 'Pro', count: billingCycle === 'annual' ? 60 : 5 },
+        { type: 'Highend', count: billingCycle === 'annual' ? 60 : 5 }
       ]
     },
     'gold-plan': {
@@ -59,6 +64,11 @@ const PricingPage = () => {
         { type: 'Basic', count: 30 },
         { type: 'Pro', count: 20 },
         { type: 'Highend', count: 10 }
+      ],
+      getBreakdown: (billingCycle) => [
+        { type: 'Basic', count: billingCycle === 'annual' ? 360 : 30 },
+        { type: 'Pro', count: billingCycle === 'annual' ? 240 : 20 },
+        { type: 'Highend', count: billingCycle === 'annual' ? 120 : 10 }
       ]
     },
     'diamond-plan': {
@@ -68,6 +78,11 @@ const PricingPage = () => {
         { type: 'Basic', count: 70 },
         { type: 'Pro', count: 60 },
         { type: 'Highend', count: 20 }
+      ],
+      getBreakdown: (billingCycle) => [
+        { type: 'Basic', count: billingCycle === 'annual' ? 840 : 70 },
+        { type: 'Pro', count: billingCycle === 'annual' ? 720 : 60 },
+        { type: 'Highend', count: billingCycle === 'annual' ? 240 : 20 }
       ]
     }
   };
@@ -120,7 +135,8 @@ const PricingPage = () => {
 
   const getPlanImages = (plan) => {
     const override = NGN_PLAN_OVERRIDES[plan._id];
-    return subscriptionCurrency === 'NGN' && override ? override.images : plan.images;
+    const baseImages = subscriptionCurrency === 'NGN' && override ? override.images : plan.images;
+    return billingCycle === 'annual' ? baseImages * 12 : baseImages;
   };
 
   const getPayPerImagePrice = (service) => {
@@ -140,17 +156,34 @@ const PricingPage = () => {
       name: "Silver Plan",
       monthlyPrice: 97,
       annualPrice: 989, // (97 * 0.85) * 12 = 82.45 * 12 = 989.4
-      images: 20,
+      images: 30,
       bestFor: "Freelancers, new photographers",
       notes: "Entry-level option to try the service.",
       popular: false,
       savings: "$163 (~14% off)", // 97*12 - 989 = 1164 - 989 = 175, but showing effective savings
-      effectiveRate: "$4.11/image", // 989/12/20 = 4.11
+      effectiveRate: "$2.75/image", // 989/12/30 = 2.75
       retailValue: "$170",
       includes: [
         { type: "Natural", count: 10, value: "$50" },
         { type: "High-End", count: 8, value: "$80" },
         { type: "Magazine", count: 2, value: "$40" },
+      ],
+      getIncludes: (billingCycle) => [
+        { 
+          type: "Natural", 
+          count: billingCycle === 'annual' ? 120 : 10, 
+          value: billingCycle === 'annual' ? "$600" : "$50" 
+        },
+        { 
+          type: "High-End", 
+          count: billingCycle === 'annual' ? 96 : 8, 
+          value: billingCycle === 'annual' ? "$960" : "$80" 
+        },
+        { 
+          type: "Magazine", 
+          count: billingCycle === 'annual' ? 24 : 2, 
+          value: billingCycle === 'annual' ? "$480" : "$40" 
+        },
       ],
       features: [
         "Basic color correction",
@@ -179,6 +212,23 @@ const PricingPage = () => {
         { type: "High-End", count: 25, value: "$250" },
         { type: "Magazine", count: 5, value: "$100" },
       ],
+      getIncludes: (billingCycle) => [
+        { 
+          type: "Natural", 
+          count: billingCycle === 'annual' ? 360 : 30, 
+          value: billingCycle === 'annual' ? "$1,800" : "$150" 
+        },
+        { 
+          type: "High-End", 
+          count: billingCycle === 'annual' ? 300 : 25, 
+          value: billingCycle === 'annual' ? "$3,000" : "$250" 
+        },
+        { 
+          type: "Magazine", 
+          count: billingCycle === 'annual' ? 60 : 5, 
+          value: billingCycle === 'annual' ? "$1,200" : "$100" 
+        },
+      ],
       features: [
         "All Silver features",
         "Advanced retouching",
@@ -206,6 +256,23 @@ const PricingPage = () => {
         { type: "Natural", count: 75, value: "$375" },
         { type: "High-End", count: 60, value: "$600" },
         { type: "Magazine", count: 15, value: "$300" },
+      ],
+      getIncludes: (billingCycle) => [
+        { 
+          type: "Natural", 
+          count: billingCycle === 'annual' ? 900 : 75, 
+          value: billingCycle === 'annual' ? "$4,500" : "$375" 
+        },
+        { 
+          type: "High-End", 
+          count: billingCycle === 'annual' ? 720 : 60, 
+          value: billingCycle === 'annual' ? "$7,200" : "$600" 
+        },
+        { 
+          type: "Magazine", 
+          count: billingCycle === 'annual' ? 180 : 15, 
+          value: billingCycle === 'annual' ? "$3,600" : "$300" 
+        },
       ],
       features: [
         "All Gold features",

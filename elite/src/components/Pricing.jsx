@@ -27,8 +27,10 @@ const pricingTiers = [
     inverse: false,
     beforeImage: aBefore,
     afterImage: aAfter,
-    features: (currency) => [
-      "Up to 10 Natural, 8 High-End, 2 Magazine",
+    features: (currency, billingCycle) => [
+      billingCycle === 'annual' 
+        ? "Up to 120 Natural, 96 High-End, 24 Magazine"
+        : "Up to 10 Natural, 8 High-End, 2 Magazine",
       `Save ${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '73' : '60,000'} (~43% off)`,
       `Effective rate: ~${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '4.85' : '3,000'}/image`,
       "Commercial usage rights",
@@ -55,8 +57,10 @@ const pricingTiers = [
     inverse: true,
     beforeImage: bBefore,
     afterImage: bAfter,
-    features: (currency) => [
-      "Up to 30 Natural, 25 High-End, 5 Magazine",
+    features: (currency, billingCycle) => [
+      billingCycle === 'annual' 
+        ? "Up to 360 Natural, 300 High-End, 60 Magazine"
+        : "Up to 30 Natural, 25 High-End, 5 Magazine",
       `Save ${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '303' : '130,000'} (~61% off)`,
       `Effective rate: ~${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '3.28' : '2,000'}/image`,
       "Commercial usage rights",
@@ -84,8 +88,10 @@ const pricingTiers = [
     inverse: false,
     beforeImage: cBefore,
     afterImage: cAfter,
-    features: (currency) => [
-      "Up to 75 Natural, 60 High-End, 15 Magazine",
+    features: (currency, billingCycle) => [
+      billingCycle === 'annual' 
+        ? "Up to 900 Natural, 720 High-End, 180 Magazine"
+        : "Up to 75 Natural, 60 High-End, 15 Magazine",
       `Save ${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '878' : '200,000'} (~69% off)`,
       `Effective rate: ~${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '2.65' : '1,333.33'}/image`,
       "Commercial usage rights",
@@ -108,6 +114,7 @@ export const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currency, setCurrency] = useState('USD'); // 'USD' or 'NGN'
+  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'annual'
 
   const handlePricingClick = () => {
     if (user) {
@@ -117,6 +124,19 @@ export const Pricing = () => {
       // User is not authenticated, go to auth page
       navigate('/auth');
     }
+  };
+
+  // Function to get multiplied content numbers for annual billing
+  const getMultipliedContent = (content) => {
+    if (billingCycle === 'annual') {
+      // Extract number from content string and multiply by 12
+      const match = content.match(/(\d+)/);
+      if (match) {
+        const number = parseInt(match[1]);
+        return content.replace(/\d+/, (number * 12).toString());
+      }
+    }
+    return content;
   };
 
   return (
@@ -129,6 +149,35 @@ export const Pricing = () => {
             modeling agencies, and creative studios use our service to handle all their 
             image needs every month.
           </p>
+          
+          {/* Billing Cycle Toggle */}
+          <div className="mt-8 flex justify-center">
+            <div className="bg-white rounded-lg p-1 shadow-lg border border-blue-200">
+              <button
+                onClick={() => setBillingCycle('monthly')}
+                className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+                  billingCycle === 'monthly'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingCycle('annual')}
+                className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+                  billingCycle === 'annual'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                Annual
+                <span className="ml-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                  Save 15%
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
         
         <div className="flex flex-col gap-8 items-center mt-16 lg:flex-row lg:items-stretch lg:justify-center">
@@ -229,13 +278,20 @@ export const Pricing = () => {
                 <div className="flex items-baseline gap-1 mt-2">
                   <span className="text-5xl font-bold tracking-tighter">
                     {currency === 'USD' ? '$' : '₦'}
-                    {currency === 'USD' ? monthlyPrice : monthlyPriceNGN.toLocaleString()}
+                    {billingCycle === 'annual' 
+                      ? currency === 'USD' 
+                        ? Math.round(monthlyPrice * 12 * 0.85)
+                        : Math.round(monthlyPriceNGN * 12 * 0.85).toLocaleString()
+                      : currency === 'USD' 
+                        ? monthlyPrice 
+                        : monthlyPriceNGN.toLocaleString()
+                    }
                   </span>
                   <span className={twMerge(
                     "tracking-tight font-medium",
                     inverse ? "text-blue-200" : "text-blue-600"
                   )}>
-                    /month
+                    /{billingCycle === 'annual' ? 'year' : 'month'}
                   </span>
                 </div>
                 
@@ -243,7 +299,11 @@ export const Pricing = () => {
                   "text-lg font-semibold mt-2 mb-6",
                   inverse ? "text-white" : "text-blue-800"
                 )}>
-                  {currency === 'USD' ? images : imagesNGN}
+                  {billingCycle === 'annual' 
+                    ? getMultipliedContent(currency === 'USD' ? images : imagesNGN)
+                    : currency === 'USD' ? images : imagesNGN
+                  }
+                  {billingCycle === 'annual' && ' per year'}
                 </div>
                 
                 <div className={twMerge(
@@ -279,7 +339,7 @@ export const Pricing = () => {
                 </button>
                 
                 <ul className="flex flex-col gap-4 mt-8">
-                  {features(currency).map((feature, idx) => (
+                  {features(currency, billingCycle).map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className={twMerge(
                         "p-1 rounded-full mt-1 flex-shrink-0",

@@ -99,7 +99,7 @@ const SubscriptionPlansSection = ({
                   </div>
                   <p className={`mt-1 ${
                     plan.popular ? 'text-blue-100' : 'text-blue-700'
-                  }`}>{getPlanImages(plan)} images per month</p>
+                  }`}>{getPlanImages(plan)} images per {billingCycle === 'annual' ? 'year' : 'month'}</p>
                   {billingCycle === 'annual' && (
                     <p className={`text-sm mt-1 ${
                       plan.popular ? 'text-green-300' : 'text-green-600'
@@ -124,7 +124,10 @@ const SubscriptionPlansSection = ({
                   }`}>{subscriptionCurrency === 'NGN' ? 'Included Allocation' : 'Value Breakdown'}</h4>
                   {subscriptionCurrency === 'NGN' ? (
                     <div className="space-y-1 text-sm">
-                      {NGN_PLAN_OVERRIDES[plan._id]?.breakdown.map((b, i) => (
+                      {(NGN_PLAN_OVERRIDES[plan._id]?.getBreakdown ? 
+                        NGN_PLAN_OVERRIDES[plan._id].getBreakdown(billingCycle) : 
+                        NGN_PLAN_OVERRIDES[plan._id]?.breakdown || []
+                      ).map((b, i) => (
                         <div key={i} className={`${plan.popular ? 'text-blue-100' : 'text-blue-700'}`}>
                           {b.count} {b.type}
                         </div>
@@ -132,8 +135,8 @@ const SubscriptionPlansSection = ({
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {plan.includes.map((item, i) => {
-                        const itemPrice = parseInt(item.value.replace('$', ''));
+                      {(plan.getIncludes ? plan.getIncludes(billingCycle) : plan.includes).map((item, i) => {
+                        const itemPrice = parseInt(item.value.replace('$', '').replace(',', ''));
                         return (
                           <div key={i} className="flex justify-between text-sm">
                             <span className={`${
