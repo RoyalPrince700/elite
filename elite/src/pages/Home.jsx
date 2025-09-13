@@ -15,7 +15,7 @@ const Home = () => {
     <div>
       {/* <NavBar/> */}
       <Hero/>
-      <LogoTicker/>
+      {/* <LogoTicker/> */}
       {/* <ProductShowcase/> */}
       <Pricing/>
       <CallToAction/>

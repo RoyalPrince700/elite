@@ -19,7 +19,7 @@ const pricingTiers = [
     title: "Silver Plan",
     monthlyPrice: 97,
     monthlyPriceNGN: 90000,
-    images: "20 images",
+    images: "30 images",
     imagesNGN: "30 images",
     audience: "Freelancers, new photographers",
     description: "Entry-level option to try the service.",
@@ -27,15 +27,10 @@ const pricingTiers = [
     inverse: false,
     beforeImage: aBefore,
     afterImage: aAfter,
-    features: [
+    features: (currency) => [
       "Up to 10 Natural, 8 High-End, 2 Magazine",
-      "Save $73 (~43% off)",
-      "Effective rate: ~$4.85/image",
-      "Commercial usage rights",
-      "Standard support"
-    ],
-    featuresNGN: [
-      "Up to 20 Basic, 5 Pro, 5 High-End",
+      `Save ${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '73' : '60,000'} (~43% off)`,
+      `Effective rate: ~${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '4.85' : '3,000'}/image`,
       "Commercial usage rights",
       "Standard support"
     ],
@@ -60,16 +55,10 @@ const pricingTiers = [
     inverse: true,
     beforeImage: bBefore,
     afterImage: bAfter,
-    features: [
+    features: (currency) => [
       "Up to 30 Natural, 25 High-End, 5 Magazine",
-      "Save $303 (~61% off)",
-      "Effective rate: ~$3.28/image",
-      "Commercial usage rights",
-      "Priority chat support",
-      "Mix & match across styles"
-    ],
-    featuresNGN: [
-      "Up to 30 Basic, 20 Pro, 10 High-End",
+      `Save ${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '303' : '130,000'} (~61% off)`,
+      `Effective rate: ~${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '3.28' : '2,000'}/image`,
       "Commercial usage rights",
       "Priority chat support",
       "Mix & match across styles"
@@ -95,17 +84,10 @@ const pricingTiers = [
     inverse: false,
     beforeImage: cBefore,
     afterImage: cAfter,
-    features: [
+    features: (currency) => [
       "Up to 75 Natural, 60 High-End, 15 Magazine",
-      "Save $878 (~69% off)",
-      "Effective rate: ~$2.65/image",
-      "Commercial usage rights",
-      "Priority delivery",
-      "Dedicated account manager",
-      "Mix & match across styles"
-    ],
-    featuresNGN: [
-      "Up to 70 Basic, 60 Pro, 20 High-End",
+      `Save ${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '878' : '200,000'} (~69% off)`,
+      `Effective rate: ~${currency === 'USD' ? '$' : '₦'}${currency === 'USD' ? '2.65' : '1,333.33'}/image`,
       "Commercial usage rights",
       "Priority delivery",
       "Dedicated account manager",
@@ -152,7 +134,7 @@ export const Pricing = () => {
         <div className="flex flex-col gap-8 items-center mt-16 lg:flex-row lg:items-stretch lg:justify-center">
           {pricingTiers.map(
             (
-              { title, monthlyPrice, monthlyPriceNGN, images, imagesNGN, audience, description, buttonText, popular, inverse, features, featuresNGN, details, beforeImage, afterImage },
+              { title, monthlyPrice, monthlyPriceNGN, images, imagesNGN, audience, description, buttonText, popular, inverse, features, details, beforeImage, afterImage },
               index
             ) => (
               <div key={index} className="space-y-6">
@@ -297,7 +279,7 @@ export const Pricing = () => {
                 </button>
                 
                 <ul className="flex flex-col gap-4 mt-8">
-                  {(currency === 'USD' ? features : featuresNGN).map((feature, idx) => (
+                  {features(currency).map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className={twMerge(
                         "p-1 rounded-full mt-1 flex-shrink-0",
