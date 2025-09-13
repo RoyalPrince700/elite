@@ -43,19 +43,19 @@ const SubscriptionBilling = ({
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Subscription & Billing</h2>
-        <div className="flex items-center space-x-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0">
+        <h2 className="text-xl font-bold text-gray-900 text-center sm:text-left">Subscription & Billing</h2>
+        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3">
           <a
             href="/subscriptions"
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium text-center sm:text-left"
           >
             View All Subscriptions →
           </a>
           {onRefreshSubscriptions && (
             <button
               onClick={onRefreshSubscriptions}
-              className="text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center"
+              className="text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center justify-center sm:justify-start"
               title="Refresh subscriptions"
             >
               <FaSync className="mr-1" />
@@ -219,8 +219,8 @@ const SubscriptionBilling = ({
             {invoices.slice(0, 3).map((invoice) => {
               const hasPaymentReceipt = paymentReceipts.some(receipt => receipt.invoiceId === invoice._id);
               return (
-                <div key={invoice._id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                  <div className="flex items-center space-x-3">
+                <div key={invoice._id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-gray-200 rounded-lg">
+                  <div className="flex items-center space-x-3 mb-3 sm:mb-0">
                     <FaFileInvoiceDollar className="text-gray-400" />
                     <div>
                       <p className="font-medium text-gray-900">Invoice #{invoice.invoiceNumber || invoice._id.slice(-8)}</p>
@@ -229,35 +229,37 @@ const SubscriptionBilling = ({
                       </p>
                     </div>
                   </div>
-                  <div className="text-right flex items-center space-x-2">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                    <div className="text-left sm:text-right">
                       <p className="font-semibold text-gray-900">
                         {invoice.currency === 'NGN' ? `₦${invoice.amount.toLocaleString()}` : `$${invoice.amount}`}
                       </p>
-                      <p className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(invoice.status)}`}>
+                      <p className={`text-xs px-2 py-1 rounded-full font-medium inline-block ${getStatusColor(invoice.status)}`}>
                         {invoice.status === 'payment_made' ? 'Awaiting Confirmation' :
                          invoice.status === 'payment_confirmed' ? 'Payment Confirmed' :
                          invoice.status}
                       </p>
                     </div>
-                    <button
-                      onClick={() => onViewInvoice(invoice)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
-                    >
-                      <FaEye className="inline mr-1" />
-                      View
-                    </button>
-                    {invoice.status === 'sent' && !hasPaymentReceipt && (
+                    <div className="flex space-x-2">
                       <button
-                        onClick={() => onPaymentStatusUpdate(invoice._id, 'payment_made')}
-                        className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
+                        onClick={() => onViewInvoice(invoice)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
                       >
-                        Mark Paid
+                        <FaEye className="inline mr-1" />
+                        View
                       </button>
-                    )}
-                    {hasPaymentReceipt && (
-                      <span className="text-sm text-blue-600 font-medium">Payment Submitted</span>
-                    )}
+                      {invoice.status === 'sent' && !hasPaymentReceipt && (
+                        <button
+                          onClick={() => onPaymentStatusUpdate(invoice._id, 'payment_made')}
+                          className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
+                        >
+                          Mark Paid
+                        </button>
+                      )}
+                      {hasPaymentReceipt && (
+                        <span className="text-sm text-blue-600 font-medium">Payment Submitted</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

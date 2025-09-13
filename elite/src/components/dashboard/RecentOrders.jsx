@@ -26,31 +26,36 @@ const RecentOrders = ({ recentOrders }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+    <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
+        <h2 className="text-lg md:text-xl font-bold text-gray-900">Recent Orders</h2>
         <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
           View All
         </button>
       </div>
 
       {recentOrders.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {recentOrders.map((order) => (
-            <div key={order._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                {getStatusIcon(order.status)}
-                <div>
-                  <p className="font-medium text-gray-900">
+            <div key={order._id} className="flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                <div className="flex-shrink-0">
+                  {getStatusIcon(order.status)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900 text-sm md:text-base truncate">
                     Order #{order._id.slice(-8)}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                  <p className="text-xs md:text-sm text-gray-600">
+                    {new Date(order.createdAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric'
+                    })}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+              <div className="flex items-center ml-2 flex-shrink-0">
+                <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(order.status)}`}>
                   {order.status}
                 </span>
               </div>
@@ -58,10 +63,10 @@ const RecentOrders = ({ recentOrders }) => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <FaHistory className="mx-auto h-12 w-12 text-gray-400" />
+        <div className="text-center py-6 md:py-8">
+          <FaHistory className="mx-auto h-10 w-10 md:h-12 md:w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No orders yet</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-xs md:text-sm text-gray-500 px-2">
             Start by uploading some photos to create your first order.
           </p>
         </div>

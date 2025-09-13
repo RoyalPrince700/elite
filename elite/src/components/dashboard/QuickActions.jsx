@@ -80,31 +80,31 @@ const QuickActions = ({ subscriptions = [], onPhotoUpload }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+      <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+        <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Quick Actions</h2>
 
         <div className="space-y-3">
           <button
             onClick={handleUploadClick}
             disabled={!hasAvailableSubscriptions}
-            className={`w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg transition-colors ${
+            className={`w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg transition-colors ${
               !hasAvailableSubscriptions
                 ? 'bg-gray-100 cursor-not-allowed opacity-60'
                 : 'hover:bg-gray-50 cursor-pointer'
             }`}
           >
-            <div className="flex items-center space-x-3">
-              <FaCamera className={`${
+            <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+              <FaCamera className={`flex-shrink-0 ${
                 !hasAvailableSubscriptions ? 'text-gray-400' : 'text-blue-600'
               }`} />
-              <div className="text-left">
-                <span className={`font-medium ${
+              <div className="text-left min-w-0 flex-1">
+                <span className={`font-medium text-sm md:text-base ${
                   !hasAvailableSubscriptions ? 'text-gray-400' : 'text-gray-900'
                 }`}>
                   Upload New Photos
                 </span>
                 {hasAvailableSubscriptions && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-1 truncate">
                     {availableSubscriptions.length === 1
                       ? getSubscriptionStatusText(availableSubscriptions[0])
                       : `${availableSubscriptions.length} active plans available`
@@ -113,8 +113,8 @@ const QuickActions = ({ subscriptions = [], onPhotoUpload }) => {
                 )}
                 {allPlansExhausted && (
                   <p className="text-xs text-red-500 mt-1 flex items-center">
-                    <FaExclamationTriangle className="mr-1" />
-                    All plan limits reached
+                    <FaExclamationTriangle className="mr-1 flex-shrink-0" />
+                    <span className="truncate">All plan limits reached</span>
                   </p>
                 )}
                 {!hasActiveSubscriptions && (
@@ -124,33 +124,33 @@ const QuickActions = ({ subscriptions = [], onPhotoUpload }) => {
                 )}
               </div>
             </div>
-            <FaUpload className={`${
+            <FaUpload className={`flex-shrink-0 ${
               !hasAvailableSubscriptions ? 'text-gray-400' : 'text-gray-400'
             }`} />
           </button>
 
-          <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center space-x-3">
-              <FaHistory className="text-green-600" />
-              <span className="font-medium text-gray-900">View Order History</span>
+          <button className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+              <FaHistory className="text-green-600 flex-shrink-0" />
+              <span className="font-medium text-gray-900 text-sm md:text-base truncate">View Order History</span>
             </div>
-            <FaHistory className="text-gray-400" />
+            <FaHistory className="text-gray-400 flex-shrink-0" />
           </button>
 
-          <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center space-x-3">
-              <FaFileInvoiceDollar className="text-purple-600" />
-              <span className="font-medium text-gray-900">View Invoices</span>
+          <button className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+              <FaFileInvoiceDollar className="text-purple-600 flex-shrink-0" />
+              <span className="font-medium text-gray-900 text-sm md:text-base truncate">View Invoices</span>
             </div>
-            <FaFileInvoiceDollar className="text-gray-400" />
+            <FaFileInvoiceDollar className="text-gray-400 flex-shrink-0" />
           </button>
 
-          <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center space-x-3">
-              <FaDownload className="text-indigo-600" />
-              <span className="font-medium text-gray-900">Download Center</span>
+          <button className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+              <FaDownload className="text-indigo-600 flex-shrink-0" />
+              <span className="font-medium text-gray-900 text-sm md:text-base truncate">Download Center</span>
             </div>
-            <FaDownload className="text-gray-400" />
+            <FaDownload className="text-gray-400 flex-shrink-0" />
           </button>
         </div>
       </div>

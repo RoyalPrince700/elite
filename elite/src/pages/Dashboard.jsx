@@ -296,19 +296,18 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <StatsCards stats={stats} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Orders */}
-          <RecentOrders recentOrders={recentOrders} />
-
-          {/* Quick Actions */}
+        {/* Quick Actions - Moved to top for better mobile UX */}
+        <div className="mb-8">
           <QuickActions subscriptions={subscriptions} />
         </div>
 
+        {/* Stats Cards */}
+        <StatsCards stats={stats} />
 
-        {/* Subscription & Billing Section */}
+        {/* Recent Orders */}
+        <RecentOrders recentOrders={recentOrders} />
+
+        {/* Full Subscription & Billing Section */}
         <SubscriptionBilling
           subscriptions={subscriptions}
           invoices={invoices}
