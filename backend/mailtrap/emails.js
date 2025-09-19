@@ -93,6 +93,16 @@ export const sendInvoiceEmail = async (userEmail, invoiceData) => {
 };
 
 /**
+ * Send subscription activated email
+ * @param {string} userEmail - User's email address
+ * @param {Object} data - Activation data
+ */
+export const sendSubscriptionActivatedEmail = async (userEmail, data) => {
+  const { subject, html, text } = emailTemplates.subscriptionActivated(data);
+  return await sendEmail(userEmail, subject, html, text);
+};
+
+/**
  * Send admin notification email
  * @param {string} adminEmail - Admin's email address
  * @param {string} notificationType - Type of notification
@@ -102,4 +112,34 @@ export const sendInvoiceEmail = async (userEmail, invoiceData) => {
 export const sendAdminNotificationEmail = async (adminEmail, notificationType, data) => {
   const { subject, html, text } = emailTemplates.adminNotification(notificationType, data);
   return await sendEmail(adminEmail, subject, html, text);
+};
+
+/**
+ * Send subscription request receipt email
+ * @param {string} userEmail - User email
+ * @param {Object} data - Receipt data (planName, billingCycle, amount, currency, etc.)
+ */
+export const sendSubscriptionRequestReceiptEmail = async (userEmail, data) => {
+  const { subject, html, text } = emailTemplates.subscriptionRequestReceipt(data);
+  return await sendEmail(userEmail, subject, html, text);
+};
+
+/**
+ * Send chat notification to admin when user sends a message
+ * @param {string} adminEmail
+ * @param {Object} data - { userFullName, userEmail, messageText, chatId, dashboardUrl, sentAt }
+ */
+export const sendChatNotificationToAdmin = async (adminEmail, data = {}) => {
+  const { subject, html, text } = emailTemplates.chatMessageToAdmin(data);
+  return await sendEmail(adminEmail, subject, html, text);
+};
+
+/**
+ * Send chat notification to user when admin sends a message
+ * @param {string} userEmail
+ * @param {Object} data - { adminFullName, userFullName, messageText, chatUrl, sentAt }
+ */
+export const sendChatNotificationToUser = async (userEmail, data = {}) => {
+  const { subject, html, text } = emailTemplates.chatMessageToUser(data);
+  return await sendEmail(userEmail, subject, html, text);
 };

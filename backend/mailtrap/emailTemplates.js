@@ -11,7 +11,8 @@ export const emailTemplates = {
    * @returns {Object} - Email template data
    */
   welcome: (userName) => {
-    const subject = "Welcome to Elite Retoucher! 🎉";
+    const firstName = userName.split(' ')[0];
+    const subject = "Welcome to Elite Retoucher!";
     const html = `
       <!DOCTYPE html>
       <html>
@@ -26,31 +27,49 @@ export const emailTemplates = {
           .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
           .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
           .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+          .steps { margin: 20px 0; }
+          .step { margin: 15px 0; padding-left: 20px; position: relative; }
+          .step-number { position: absolute; left: 0; background: #667eea; color: white; width: 20px; height: 20px; border-radius: 50%; text-align: center; font-size: 12px; line-height: 20px; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
             <h1>Welcome to Elite Retoucher!</h1>
-            <p>Professional Photo Retouching Services</p>
+            <p>Your destination for professional, high-end photo retouching</p>
           </div>
           <div class="content">
-            <h2>Hello ${userName}!</h2>
-            <p>Welcome to Elite Retoucher, where your photos get the professional treatment they deserve!</p>
-            <p>We're excited to have you on board. Here's what you can do with your account:</p>
-            <ul>
-              <li>Upload and retouch your photos with our AI-powered tools</li>
-              <li>Choose from various retouching styles and effects</li>
-              <li>Download high-quality processed images</li>
-              <li>Manage your subscription and billing</li>
-            </ul>
-            <p>Ready to get started? Upload your first photo and see the magic happen!</p>
-            <a href="https://www.eliteretoucher.com" class="button">Get Started</a>
-            <p>If you have any questions, feel free to reach out to our support team.</p>
-            <p>Best regards,<br>The Elite Retoucher Team</p>
+            <p>Hi ${firstName},</p>
+            <p>Welcome to Elite Retoucher, your destination for professional, high-end photo retouching. We're excited to bring your images to life with exceptional detail and quality.</p>
+
+            <p>Here's how to get started:</p>
+
+            <div class="steps">
+              <div class="step">
+                <span class="step-number">1</span>
+                Choose Your Service – Select a Subscription Plan for ongoing retouching or a Per-Image Option for one-time projects.
+              </div>
+              <div class="step">
+                <span class="step-number">2</span>
+                Upload Your Photos – After selecting your plan, send us the images you'd like retouched.
+              </div>
+              <div class="step">
+                <span class="step-number">3</span>
+                Download the Results – Receive beautifully retouched, high-resolution images ready for print or online use.
+              </div>
+            </div>
+
+            <p>With your account, you can also track orders, manage your plan, and securely download completed edits anytime.</p>
+
+            <p>Start by selecting the service that best fits your needs:</p>
+            <a href="https://www.eliteretoucher.com/pricing" class="button">View Plans & Pricing</a>
+
+            <p>Thanks for choosing Elite Retoucher—your photos deserve expert retouching every time.</p>
+
+            <p>Best regards,<br>The Elite Retoucher Team<br><a href="https://www.eliteretoucher.com">www.eliteretoucher.com</a></p>
           </div>
           <div class="footer">
-            <p>© 2024 Elite Retoucher. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.</p>
             <p>This email was sent to you because you created an account with us.</p>
           </div>
         </div>
@@ -59,25 +78,224 @@ export const emailTemplates = {
     `;
     const text = `
       Welcome to Elite Retoucher!
-      
-      Hello ${userName}!
-      
-      Welcome to Elite Retoucher, where your photos get the professional treatment they deserve!
-      
-      We're excited to have you on board. Here's what you can do with your account:
-      - Upload and retouch your photos with our AI-powered tools
-      - Choose from various retouching styles and effects
-      - Download high-quality processed images
-      - Manage your subscription and billing
-      
-      Ready to get started? Visit: https://www.eliteretoucher.com
-      
-      If you have any questions, feel free to reach out to our support team.
-      
+
+      Hi ${firstName},
+
+      Welcome to Elite Retoucher, your destination for professional, high-end photo retouching. We're excited to bring your images to life with exceptional detail and quality.
+
+      Here's how to get started:
+
+      1. Choose Your Service – Select a Subscription Plan for ongoing retouching or a Per-Image Option for one-time projects.
+
+      2. Upload Your Photos – After selecting your plan, send us the images you'd like retouched.
+
+      3. Download the Results – Receive beautifully retouched, high-resolution images ready for print or online use.
+
+      With your account, you can also track orders, manage your plan, and securely download completed edits anytime.
+
+      Start by selecting the service that best fits your needs: View Plans & Pricing
+      https://www.eliteretoucher.com/pricing
+
+      Thanks for choosing Elite Retoucher—your photos deserve expert retouching every time.
+
       Best regards,
       The Elite Retoucher Team
-      
-      © 2024 Elite Retoucher. All rights reserved.
+      www.eliteretoucher.com
+
+      © ${new Date().getFullYear()} Elite Retoucher. All rights reserved.
+    `;
+    return { subject, html, text };
+  },
+
+  /**
+   * Subscription activated email template
+   * @param {Object} data
+   * @param {string} data.fullName
+   * @param {string} data.planName
+   * @param {string} data.billingCycle
+   * @param {string} data.currency
+   * @param {number|string} data.amount
+   * @param {Date|string} data.startDate
+   * @param {Date|string} data.endDate
+   * @returns {Object}
+   */
+  subscriptionActivated: (data = {}) => {
+    const {
+      fullName = 'Customer',
+      planName = 'Your Plan',
+      billingCycle = 'monthly',
+      currency = 'USD',
+      amount,
+      startDate,
+      endDate
+    } = data;
+
+    const firstName = (fullName || '').split(' ')[0] || 'there';
+    const currencySymbol = currency === 'NGN' ? '₦' : '$';
+    const formattedAmount = typeof amount === 'number' ? amount.toLocaleString() : amount;
+    const start = startDate ? new Date(startDate) : new Date();
+    const end = endDate ? new Date(endDate) : null;
+    const startStr = start.toLocaleDateString();
+    const endStr = end ? end.toLocaleDateString() : '';
+
+    const subject = `Your Subscription is Active – ${planName} (${billingCycle})`;
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Subscription Activated - Elite Retoucher</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a; }
+          .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+          .header { background: #16a34a; color: white; padding: 28px; text-align: center; border-radius: 12px 12px 0 0; }
+          .content { background: #f8fafc; padding: 24px; border-radius: 0 0 12px 12px; }
+          .section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 14px 0; }
+          .row { display: flex; justify-content: space-between; margin: 8px 0; }
+          .label { color: #64748b; }
+          .value { color: #0f172a; font-weight: 600; }
+          .button { display: inline-block; background: #0ea5e9; color: #ffffff !important; padding: 12px 20px; text-decoration: none; border-radius: 8px; margin-top: 14px; font-weight: 600; }
+          .footer { text-align: center; margin-top: 16px; color: #64748b; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Congratulations, ${firstName}! 🎉</h1>
+            <p>Your subscription is now active</p>
+          </div>
+          <div class="content">
+            <p>We're excited to let you know that your subscription has been activated.</p>
+            <div class="section">
+              <div class="row"><span class="label">Plan</span><span class="value">${planName}</span></div>
+              <div class="row"><span class="label">Billing cycle</span><span class="value">${billingCycle}</span></div>
+              ${formattedAmount ? `<div class="row"><span class="label">Amount</span><span class="value">${currencySymbol}${formattedAmount} ${currency}</span></div>` : ''}
+              <div class="row"><span class="label">Start date</span><span class="value">${startStr}</span></div>
+              ${endStr ? `<div class="row"><span class="label">Expires</span><span class="value">${endStr}</span></div>` : ''}
+              <div class="row"><span class="label">Status</span><span class="value">Active</span></div>
+            </div>
+            <p>Head to your dashboard to view your plan details and start submitting images.</p>
+            <a href="https://www.eliteretoucher.com/dashboard" class="button">Open Dashboard</a>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const text = `
+      Your subscription is active – ${planName} (${billingCycle})
+
+      Plan: ${planName}
+      Billing cycle: ${billingCycle}
+      ${formattedAmount ? `Amount: ${currencySymbol}${formattedAmount} ${currency}\n` : ''}Start date: ${startStr}
+      ${endStr ? `Expires: ${endStr}\n` : ''}Status: Active
+
+      Open Dashboard: https://www.eliteretoucher.com/dashboard
+    `;
+    return { subject, html, text };
+  },
+
+  /**
+   * Subscription request receipt email template
+   * @param {Object} data - Receipt data
+   * @param {string} data.fullName - User's full name
+   * @param {string} data.planName - Plan name
+   * @param {string} data.billingCycle - Billing cycle (monthly|yearly)
+   * @param {number|string} data.amount - Final amount
+   * @param {string} data.currency - Currency code (USD|NGN)
+   * @param {string} [data.companyName]
+   * @param {string} [data.contactPerson]
+   * @param {Object} [data.address]
+   * @returns {Object}
+   */
+  subscriptionRequestReceipt: (data) => {
+    const {
+      fullName = 'Customer',
+      planName,
+      billingCycle,
+      amount,
+      currency = 'USD',
+      companyName,
+      contactPerson,
+      address,
+    } = data || {};
+
+    const currencySymbol = currency === 'NGN' ? '₦' : '$';
+    const formattedAmount = typeof amount === 'number' ? amount.toLocaleString() : amount;
+    const subject = `Subscription Request Received - ${planName} (${billingCycle})`;
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Subscription Request Receipt - Elite Retoucher</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #0ea5e9; color: white; padding: 24px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f8fafc; padding: 24px; border-radius: 0 0 10px 10px; }
+          .section { background: white; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 16px 0; }
+          .row { display: flex; justify-content: space-between; margin: 8px 0; }
+          .label { color: #475569; }
+          .value { font-weight: 600; color: #0f172a; }
+          .button { display: inline-block; background: #0ea5e9; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; margin-top: 12px; }
+          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 13px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Thanks for your request, ${fullName}!</h1>
+            <p>We’ve received your subscription details.</p>
+          </div>
+          <div class="content">
+            <p>Here is a receipt of your subscription request. We’ll email your invoice and next steps shortly.</p>
+            <div class="section">
+              <div class="row"><span class="label">Plan</span><span class="value">${planName}</span></div>
+              <div class="row"><span class="label">Billing cycle</span><span class="value">${billingCycle}</span></div>
+              <div class="row"><span class="label">Amount</span><span class="value">${currencySymbol}${formattedAmount}</span></div>
+              <div class="row"><span class="label">Currency</span><span class="value">${currency}</span></div>
+            </div>
+            ${companyName || contactPerson || address ? `
+            <div class="section">
+              <h3 style="margin:0 0 8px 0;">Billing info</h3>
+              ${companyName ? `<div class="row"><span class="label">Company</span><span class="value">${companyName}</span></div>` : ''}
+              ${contactPerson ? `<div class="row"><span class="label">Contact</span><span class="value">${contactPerson}</span></div>` : ''}
+              ${address ? `<div style="margin-top:8px;">
+                <div class="label" style="margin-bottom:4px;">Address</div>
+                <div class="value" style="white-space:pre-line;">
+                  ${[address?.street, address?.city, address?.state, address?.zipCode, address?.country].filter(Boolean).join(', ')}
+                </div>
+              </div>` : ''}
+            </div>` : ''}
+            <p>If anything looks incorrect, reply to this email and we’ll help fix it.</p>
+            <a href="https://www.eliteretoucher.com/dashboard" class="button">View dashboard</a>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    const text = `
+      Subscription Request Receipt - Elite Retoucher
+
+      Thanks for your request, ${fullName}!
+
+      Plan: ${planName}
+      Billing cycle: ${billingCycle}
+      Amount: ${currencySymbol}${formattedAmount}
+      Currency: ${currency}
+
+      ${companyName ? `Company: ${companyName}\n` : ''}${contactPerson ? `Contact: ${contactPerson}\n` : ''}${address ? `Address: ${[address?.street, address?.city, address?.state, address?.zipCode, address?.country].filter(Boolean).join(', ')}` : ''}
+
+      View dashboard: https://www.eliteretoucher.com/dashboard
     `;
     return { subject, html, text };
   },
@@ -330,6 +548,7 @@ export const emailTemplates = {
           table { width: 100%; border-collapse: collapse; margin: 20px 0; }
           th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
           th { background-color: #f8f9fa; }
+          .button { display: inline-block; background: #0ea5e9; color: #ffffff !important; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 16px 0; font-weight: 600; }
         </style>
       </head>
       <body>
@@ -371,6 +590,10 @@ export const emailTemplates = {
                 </tr>
               </tfoot>
             </table>
+            <p>You can view this invoice and make payment from your dashboard.</p>
+            <p>
+              <a href="https://www.eliteretoucher.com/dashboard" class="button" target="_blank" rel="noopener noreferrer">Go to Dashboard</a>
+            </p>
             <p>Thank you for your business! If you have any questions about this invoice, please contact us.</p>
             <p>Best regards,<br>The Elite Retoucher Team</p>
           </div>
@@ -394,6 +617,9 @@ export const emailTemplates = {
       
       Total Amount: $${invoiceData.totalAmount}
       
+      View and pay your invoice in your dashboard:
+      https://www.eliteretoucher.com/dashboard
+      
       Thank you for your business! If you have any questions about this invoice, please contact us.
       
       Best regards,
@@ -410,64 +636,268 @@ export const emailTemplates = {
    * @param {Object} data - Notification data
    * @returns {Object} - Email template data
    */
-  adminNotification: (notificationType, data) => {
-    const subject = `Admin Notification: ${notificationType} - Elite Retoucher`;
+  adminNotification: (notificationType, data = {}) => {
+    const {
+      requestId,
+      createdAt,
+      user = {},
+      plan = {},
+      billingCycle,
+      currency = 'USD',
+      amount,
+      companyName,
+      contactPerson,
+      phone,
+      address = {}
+    } = data || {};
+
+    const currencySymbol = currency === 'NGN' ? '₦' : '$';
+    const formattedAmount = typeof amount === 'number' ? amount.toLocaleString() : (amount || '');
+    const createdAtDisplay = createdAt ? new Date(createdAt).toUTCString() : new Date().toUTCString();
+
+    const subjectBase = notificationType?.toLowerCase?.().includes('subscription')
+      ? `New Subscription Request`
+      : notificationType || 'Admin Notification';
+    const subjectSuffix = plan?.name ? ` – ${plan.name}${billingCycle ? ` (${billingCycle})` : ''}` : '';
+    const subject = `${subjectBase}${subjectSuffix}`;
+
     const html = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Notification - Elite Retoucher</title>
+        <title>${subject}</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #dc3545; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-          .notification-details { background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #dc3545; }
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a; background:#f1f5f9; }
+          .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+          .header { background: #0ea5e9; color: white; padding: 24px; border-radius: 12px 12px 0 0; text-align:center; }
+          .content { background: #ffffff; padding: 24px; border-radius: 0 0 12px 12px; box-shadow: 0 1px 3px rgba(15,23,42,0.08); }
+          .section { border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0; }
+          .row { display: flex; justify-content: space-between; margin: 8px 0; font-size:14px; }
+          .label { color: #64748b; }
+          .value { color: #0f172a; font-weight:600; }
+          .h3 { margin: 0 0 8px 0; color:#0f172a; font-size:16px; }
+          .footer { text-align: center; margin-top: 16px; color: #64748b; font-size: 12px; }
+          .pill { display:inline-block; background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:600; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>Admin Notification</h1>
-            <p>${notificationType}</p>
+            <div class="pill">${notificationType || 'Notification'}</div>
+            <h1 style="margin:8px 0 0 0; font-size:22px;">${subjectBase}</h1>
+            ${plan?.name ? `<div style="margin-top:4px; opacity:0.9;">Plan: <strong>${plan.name}</strong>${billingCycle ? ` • ${billingCycle}` : ''}</div>` : ''}
           </div>
           <div class="content">
-            <h2>System Notification</h2>
-            <div class="notification-details">
-              <h3>Notification Type:</h3>
-              <p>${notificationType}</p>
-              <h3>Details:</h3>
-              <pre>${JSON.stringify(data, null, 2)}</pre>
+            <div class="section">
+              <div class="h3">Request Summary</div>
+              ${requestId ? `<div class="row"><div class="label">Request ID</div><div class="value">${requestId}</div></div>` : ''}
+              <div class="row"><div class="label">Created</div><div class="value">${createdAtDisplay}</div></div>
+              ${plan?.name ? `<div class="row"><div class="label">Plan</div><div class="value">${plan.name}</div></div>` : ''}
+              ${billingCycle ? `<div class="row"><div class="label">Billing Cycle</div><div class="value">${billingCycle}</div></div>` : ''}
+              ${formattedAmount ? `<div class="row"><div class="label">Amount</div><div class="value">${currencySymbol}${formattedAmount} ${currency}</div></div>` : ''}
             </div>
-            <p>Please review this notification and take appropriate action if necessary.</p>
-            <p>Best regards,<br>Elite Retoucher System</p>
+
+            <div class="section">
+              <div class="h3">User</div>
+              ${user.fullName ? `<div class="row"><div class="label">Name</div><div class="value">${user.fullName}</div></div>` : ''}
+              ${user.email ? `<div class="row"><div class="label">Email</div><div class="value">${user.email}</div></div>` : ''}
+              ${user.id ? `<div class="row"><div class="label">User ID</div><div class="value">${user.id}</div></div>` : ''}
+            </div>
+
+            ${(companyName || contactPerson || phone || (address && (address.street || address.city || address.state || address.zipCode || address.country))) ? `
+            <div class="section">
+              <div class="h3">Billing & Contact</div>
+              ${companyName ? `<div class="row"><div class="label">Company</div><div class="value">${companyName}</div></div>` : ''}
+              ${contactPerson ? `<div class="row"><div class="label">Contact</div><div class="value">${contactPerson}</div></div>` : ''}
+              ${phone ? `<div class="row"><div class="label">Phone</div><div class="value">${phone}</div></div>` : ''}
+              ${(address.street || address.city || address.state || address.zipCode || address.country) ? `
+              <div style="margin-top:8px;">
+                <div class="label" style="margin-bottom:4px;">Address</div>
+                <div class="value" style="white-space:pre-line;">${[
+                  address.street,
+                  address.city,
+                  address.state,
+                  address.zipCode,
+                  address.country
+                ].filter(Boolean).join(', ')}</div>
+              </div>` : ''}
+            </div>` : ''}
+
+            <p style="margin-top:12px; font-size:14px; color:#334155;">Please review this request in the admin dashboard and take appropriate action.</p>
           </div>
           <div class="footer">
-            <p>© 2024 Elite Retoucher. All rights reserved.</p>
-            <p>This is an automated admin notification.</p>
+            <p>© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.</p>
           </div>
         </div>
       </body>
       </html>
     `;
-    const text = `
-      Admin Notification - Elite Retoucher
-      
-      Notification Type: ${notificationType}
-      
-      Details:
-      ${JSON.stringify(data, null, 2)}
-      
-      Please review this notification and take appropriate action if necessary.
-      
-      Best regards,
-      Elite Retoucher System
-      
-      © 2024 Elite Retoucher. All rights reserved.
+
+    const textLines = [];
+    textLines.push(`${subjectBase}${plan?.name ? ` - ${plan.name}${billingCycle ? ` (${billingCycle})` : ''}` : ''}`);
+    if (requestId) textLines.push(`Request ID: ${requestId}`);
+    textLines.push(`Created: ${createdAtDisplay}`);
+    if (plan?.name) textLines.push(`Plan: ${plan.name}`);
+    if (billingCycle) textLines.push(`Billing Cycle: ${billingCycle}`);
+    if (formattedAmount) textLines.push(`Amount: ${currencySymbol}${formattedAmount} ${currency}`);
+    if (user.fullName) textLines.push(`User: ${user.fullName}`);
+    if (user.email) textLines.push(`Email: ${user.email}`);
+    if (companyName) textLines.push(`Company: ${companyName}`);
+    if (contactPerson) textLines.push(`Contact: ${contactPerson}`);
+    if (phone) textLines.push(`Phone: ${phone}`);
+    if (address && (address.street || address.city || address.state || address.zipCode || address.country)) {
+      textLines.push(`Address: ${[
+        address.street,
+        address.city,
+        address.state,
+        address.zipCode,
+        address.country
+      ].filter(Boolean).join(', ')}`);
+    }
+    textLines.push('\nPlease review this request in the admin dashboard.');
+
+    const text = textLines.join('\n');
+    return { subject, html, text };
+  },
+
+  /**
+   * Chat: Notify admin about a new user message
+   * @param {Object} data
+   * @param {string} data.userFullName
+   * @param {string} data.userEmail
+   * @param {string} data.messageText
+   * @param {string} [data.chatId]
+   * @param {string} [data.dashboardUrl]
+   * @param {Date|string} [data.sentAt]
+   */
+  chatMessageToAdmin: (data = {}) => {
+    const {
+      userFullName = 'User',
+      userEmail = '',
+      messageText = '',
+      chatId,
+      dashboardUrl = 'https://www.eliteretoucher.com/admin',
+      sentAt
+    } = data || {};
+
+    const subject = `New Chat Message from ${userFullName}`;
+    const createdDisplay = sentAt ? new Date(sentAt).toUTCString() : new Date().toUTCString();
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Chat Message</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a; background:#f1f5f9; }
+          .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+          .header { background: #0ea5e9; color: white; padding: 20px; border-radius: 12px 12px 0 0; }
+          .content { background: #ffffff; padding: 20px; border-radius: 0 0 12px 12px; box-shadow: 0 1px 3px rgba(15,23,42,0.08); }
+          .row { display: flex; justify-content: space-between; margin: 8px 0; font-size:14px; }
+          .label { color: #64748b; }
+          .value { color: #0f172a; font-weight:600; }
+          .button { display:inline-block; background:#0ea5e9; color:#ffffff !important; padding: 10px 16px; text-decoration:none; border-radius:8px; margin-top: 14px; font-weight:600; }
+          .meta { font-size:12px; color:#64748b; margin-top:8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0;">New Chat Message</h1>
+            <div class="meta">${createdDisplay}</div>
+          </div>
+          <div class="content">
+            <div class="row"><div class="label">From</div><div class="value">${userFullName}</div></div>
+            ${userEmail ? `<div class="row"><div class="label">Email</div><div class="value">${userEmail}</div></div>` : ''}
+            ${chatId ? `<div class="row"><div class="label">Chat ID</div><div class="value">${chatId}</div></div>` : ''}
+            <p style="margin-top:6px; color:#334155;">You have received a new chat message. Log in to your dashboard to view and reply.</p>
+            <a class="button" href="${dashboardUrl}">Open Admin Dashboard</a>
+          </div>
+        </div>
+      </body>
+      </html>
     `;
+
+    const text = [
+      'New Chat Message',
+      `From: ${userFullName}`,
+      userEmail ? `Email: ${userEmail}` : '',
+      chatId ? `Chat ID: ${chatId}` : '',
+      `Time: ${createdDisplay}`,
+      '',
+      'You have a new chat message. View it in your dashboard.',
+      `Open Admin Dashboard: ${dashboardUrl}`
+    ].filter(Boolean).join('\n');
+
+    return { subject, html, text };
+  },
+
+  /**
+   * Chat: Notify user about a new admin message
+   * @param {Object} data
+   * @param {string} data.adminFullName
+   * @param {string} data.userFullName
+   * @param {string} data.messageText
+   * @param {string} [data.chatUrl]
+   * @param {Date|string} [data.sentAt]
+   */
+  chatMessageToUser: (data = {}) => {
+    const {
+      adminFullName = 'Admin',
+      userFullName = 'Customer',
+      messageText = '',
+      chatUrl = 'https://www.eliteretoucher.com/dashboard',
+      sentAt
+    } = data || {};
+
+    const firstName = (userFullName || '').split(' ')[0] || 'there';
+    const subject = `New Message from ${adminFullName}`;
+    const createdDisplay = sentAt ? new Date(sentAt).toUTCString() : new Date().toUTCString();
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Message</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a; background:#f8fafc; }
+          .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+          .header { background: #16a34a; color: white; padding: 20px; border-radius: 12px 12px 0 0; }
+          .content { background: #ffffff; padding: 20px; border-radius: 0 0 12px 12px; box-shadow: 0 1px 3px rgba(15,23,42,0.08); }
+          .button { display:inline-block; background:#0ea5e9; color:#ffffff !important; padding: 10px 16px; text-decoration:none; border-radius:8px; margin-top: 14px; font-weight:600; }
+          .meta { font-size:12px; color:#64748b; margin-top:8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0;">You have a new message</h1>
+            <div class="meta">${createdDisplay}</div>
+          </div>
+          <div class="content">
+            <p>Hi ${firstName},</p>
+            <p><strong>${adminFullName}</strong> sent you a new message. Open your dashboard to view and reply.</p>
+            <a class="button" href="${chatUrl}">Reply in your dashboard</a>
+            <p style="margin-top:12px; color:#334155; font-size:14px;">You can also open the chat widget from any page when you're signed in.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const text = [
+      `Hi ${firstName},`,
+      `${adminFullName} sent you a new message.`,
+      'Open your dashboard to view and reply.',
+      `Reply in your dashboard: ${chatUrl}`
+    ].join('\n');
+
     return { subject, html, text };
   }
 };

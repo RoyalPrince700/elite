@@ -1,8 +1,37 @@
 import 'dotenv/config';
-import { sendWelcomeEmail } from '../mailtrap/emails.js';
+import { sendWelcomeEmail, sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendInvoiceEmail, sendSubscriptionActivatedEmail, sendChatNotificationToUser, sendChatNotificationToAdmin } from '../mailtrap/emails.js';
 
 function parseArgs(argv) {
-  const args = { to: 'test@example.com', name: 'Test User' };
+  const args = {
+    to: 'test@example.com',
+    name: 'Test User',
+    template: 'subscription', // subscription | welcome | admin | invoice | activated | chat-user | chat-admin
+    plan: 'Gold Plan',
+    cycle: 'monthly', // monthly | yearly
+    amount: '197',
+    currency: 'USD', // USD | NGN
+    company: '',
+    contact: '',
+    type: 'New Subscription Request',
+    requestId: '',
+    start: '',
+    end: '',
+    // invoice specific
+    invoiceNumber: '',
+    invDate: '',
+    invDue: '',
+    invStatus: 'sent',
+    itemDesc: 'Service fee',
+    itemQty: '1',
+    itemPrice: '100',
+    itemsJson: '',
+    // chat specific
+    msg: 'Hello! This is a test message.',
+    admin: 'Admin',
+    chatId: '',
+    chatUrl: '',
+    dashboardUrl: ''
+  };
   // Positional args support: node script.js <email> <name>
   if (argv[2] && !argv[2].startsWith('--')) {
     args.to = argv[2];
@@ -12,6 +41,8 @@ function parseArgs(argv) {
   }
   for (let i = 2; i < argv.length; i++) {
     const part = argv[i];
+    if (part === '--template' && argv[i + 1]) { args.template = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--template=')) { args.template = part.split('=')[1]; continue; }
     if (part === '--to' && argv[i + 1]) {
       args.to = argv[i + 1];
       i++;
@@ -30,18 +61,217 @@ function parseArgs(argv) {
       args.name = part.split('=')[1];
       continue;
     }
+    if (part === '--plan' && argv[i + 1]) { args.plan = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--plan=')) { args.plan = part.split('=')[1]; continue; }
+    if (part === '--cycle' && argv[i + 1]) { args.cycle = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--cycle=')) { args.cycle = part.split('=')[1]; continue; }
+    if (part === '--amount' && argv[i + 1]) { args.amount = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--amount=')) { args.amount = part.split('=')[1]; continue; }
+    if (part === '--currency' && argv[i + 1]) { args.currency = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--currency=')) { args.currency = part.split('=')[1]; continue; }
+    if (part === '--company' && argv[i + 1]) { args.company = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--company=')) { args.company = part.split('=')[1]; continue; }
+    if (part === '--contact' && argv[i + 1]) { args.contact = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--contact=')) { args.contact = part.split('=')[1]; continue; }
+    if (part === '--type' && argv[i + 1]) { args.type = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--type=')) { args.type = part.split('=')[1]; continue; }
+    if (part === '--requestId' && argv[i + 1]) { args.requestId = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--requestId=')) { args.requestId = part.split('=')[1]; continue; }
+    if (part === '--start' && argv[i + 1]) { args.start = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--start=')) { args.start = part.split('=')[1]; continue; }
+    if (part === '--end' && argv[i + 1]) { args.end = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--end=')) { args.end = part.split('=')[1]; continue; }
+    // invoice args
+    if (part === '--invoiceNumber' && argv[i + 1]) { args.invoiceNumber = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--invoiceNumber=')) { args.invoiceNumber = part.split('=')[1]; continue; }
+    if (part === '--invDate' && argv[i + 1]) { args.invDate = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--invDate=')) { args.invDate = part.split('=')[1]; continue; }
+    if (part === '--invDue' && argv[i + 1]) { args.invDue = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--invDue=')) { args.invDue = part.split('=')[1]; continue; }
+    if (part === '--invStatus' && argv[i + 1]) { args.invStatus = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--invStatus=')) { args.invStatus = part.split('=')[1]; continue; }
+    if (part === '--itemDesc' && argv[i + 1]) { args.itemDesc = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--itemDesc=')) { args.itemDesc = part.split('=')[1]; continue; }
+    if (part === '--itemQty' && argv[i + 1]) { args.itemQty = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--itemQty=')) { args.itemQty = part.split('=')[1]; continue; }
+    if (part === '--itemPrice' && argv[i + 1]) { args.itemPrice = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--itemPrice=')) { args.itemPrice = part.split('=')[1]; continue; }
+    if (part === '--itemsJson' && argv[i + 1]) { args.itemsJson = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--itemsJson=')) { args.itemsJson = part.split('=')[1]; continue; }
+    // chat args
+    if (part === '--msg' && argv[i + 1]) { args.msg = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--msg=')) { args.msg = part.split('=')[1]; continue; }
+    if (part === '--admin' && argv[i + 1]) { args.admin = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--admin=')) { args.admin = part.split('=')[1]; continue; }
+    if (part === '--chatId' && argv[i + 1]) { args.chatId = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--chatId=')) { args.chatId = part.split('=')[1]; continue; }
+    if (part === '--chatUrl' && argv[i + 1]) { args.chatUrl = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--chatUrl=')) { args.chatUrl = part.split('=')[1]; continue; }
+    if (part === '--dashboardUrl' && argv[i + 1]) { args.dashboardUrl = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--dashboardUrl=')) { args.dashboardUrl = part.split('=')[1]; continue; }
   }
   return args;
 }
 
 async function main() {
   try {
-    const { to, name } = parseArgs(process.argv);
-    console.log('📧 Testing Mailtrap welcome email...');
-    console.log('  → Recipient:', to);
-    console.log('  → Name     :', name);
+    const {
+      to, name, template, plan, cycle, amount, currency, company, contact, type, requestId,
+      start, end,
+      invoiceNumber, invDate, invDue, invStatus, itemDesc, itemQty, itemPrice, itemsJson,
+      msg, admin, chatId, chatUrl, dashboardUrl
+    } = parseArgs(process.argv);
 
-    await sendWelcomeEmail(to, name);
+    if (template === 'subscription') {
+      console.log('📧 Testing Mailtrap subscription request receipt email...');
+      console.log('  → Recipient   :', to);
+      console.log('  → Name        :', name);
+      console.log('  → Plan        :', plan);
+      console.log('  → BillingCycle:', cycle);
+      console.log('  → Amount      :', amount);
+      console.log('  → Currency    :', currency);
+
+      await sendSubscriptionRequestReceiptEmail(to, {
+        fullName: name,
+        planName: plan,
+        billingCycle: cycle,
+        amount: isNaN(Number(amount)) ? amount : Number(amount),
+        currency,
+        companyName: company,
+        contactPerson: contact
+      });
+    } else if (template === 'admin') {
+      console.log('📧 Testing Mailtrap admin notification email...');
+      console.log('  → Recipient   :', to);
+      console.log('  → Type        :', type);
+      console.log('  → Plan        :', plan);
+      console.log('  → BillingCycle:', cycle);
+      console.log('  → Amount      :', amount);
+      console.log('  → Currency    :', currency);
+
+      const data = {
+        requestId: requestId || `req_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        user: {
+          id: `user_${Date.now()}`,
+          email: `${name?.toLowerCase?.().replace(/\s+/g, '') || 'user'}@example.com`,
+          fullName: name
+        },
+        plan: {
+          id: plan?.toLowerCase?.().replace(/\s+/g, '-') || 'gold-plan',
+          name: plan,
+          monthlyPrice: isNaN(Number(amount)) ? amount : Number(amount)
+        },
+        billingCycle: cycle,
+        currency,
+        amount: isNaN(Number(amount)) ? amount : Number(amount),
+        companyName: company,
+        contactPerson: contact,
+        phone: '+1 555-555-5555',
+        address: { street: '123 Test St', city: 'Testville', state: 'TS', zipCode: '00000', country: 'USA' }
+      };
+
+      await sendAdminNotificationEmail(to, type, data);
+    } else if (template === 'invoice') {
+      console.log('📧 Testing Mailtrap invoice email...');
+      console.log('  → Recipient   :', to);
+      const parsedQty = isNaN(Number(itemQty)) ? 1 : Number(itemQty);
+      const parsedPrice = isNaN(Number(itemPrice)) ? 0 : Number(itemPrice);
+      let items = [];
+      if (itemsJson) {
+        try {
+          const parsed = JSON.parse(itemsJson);
+          if (Array.isArray(parsed)) {
+            items = parsed.map((it) => ({
+              description: it.description,
+              quantity: Number(it.quantity) || 1,
+              price: Number(it.price) || 0,
+              total: (Number(it.quantity) || 1) * (Number(it.price) || 0)
+            }));
+          }
+        } catch (e) {
+          console.warn('⚠️  Failed to parse itemsJson, falling back to single item.');
+        }
+      }
+      if (items.length === 0) {
+        items = [{ description: itemDesc, quantity: parsedQty, price: parsedPrice, total: parsedQty * parsedPrice }];
+      }
+      const totalAmount = items.reduce((sum, it) => sum + (Number(it.total) || 0), 0);
+      const invoiceData = {
+        invoiceNumber: invoiceNumber || `INV-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.random().toString(36).substring(2,6).toUpperCase()}`,
+        date: invDate || new Date().toISOString().slice(0, 10),
+        dueDate: invDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        status: invStatus || 'sent',
+        items,
+        totalAmount
+      };
+      await sendInvoiceEmail(to, invoiceData);
+    } else if (template === 'activated') {
+      console.log('📧 Testing Mailtrap subscription ACTIVATED email...');
+      console.log('  → Recipient   :', to);
+      console.log('  → Name        :', name);
+      console.log('  → Plan        :', plan);
+      console.log('  → BillingCycle:', cycle);
+      console.log('  → Amount      :', amount);
+      console.log('  → Currency    :', currency);
+
+      const startDate = start ? new Date(start) : new Date();
+      let endDate;
+      const s = new Date(startDate);
+      switch ((cycle || 'monthly').toLowerCase()) {
+        case 'quarterly':
+          endDate = new Date(s.getFullYear(), s.getMonth() + 3, s.getDate());
+          break;
+        case 'yearly':
+          endDate = new Date(s.getFullYear() + 1, s.getMonth(), s.getDate());
+          break;
+        default:
+          endDate = new Date(s.getFullYear(), s.getMonth() + 1, s.getDate());
+      }
+      const endOverride = end ? new Date(end) : null;
+
+      await sendSubscriptionActivatedEmail(to, {
+        fullName: name,
+        planName: plan,
+        billingCycle: cycle,
+        currency,
+        amount: isNaN(Number(amount)) ? amount : Number(amount),
+        startDate,
+        endDate: endOverride || endDate
+      });
+    } else if (template === 'chat-user') {
+      console.log('📧 Testing chat notification to USER (admin reply)...');
+      console.log('  → Recipient   :', to);
+      console.log('  → Admin       :', admin);
+      console.log('  → User Name   :', name);
+      console.log('  → Message     :', msg);
+      await sendChatNotificationToUser(to, {
+        adminFullName: admin || 'Admin',
+        userFullName: name || 'Customer',
+        messageText: msg || 'Hello from Admin',
+        chatUrl: chatUrl || process.env.USER_DASHBOARD_URL || 'https://www.eliteretoucher.com/dashboard',
+        sentAt: new Date().toISOString()
+      });
+    } else if (template === 'chat-admin') {
+      console.log('📧 Testing chat notification to ADMIN (user message)...');
+      console.log('  → Recipient   :', to);
+      console.log('  → User Name   :', name);
+      console.log('  → Message     :', msg);
+      await sendChatNotificationToAdmin(to, {
+        userFullName: name || 'User',
+        userEmail: `${(name || 'user').toLowerCase().replace(/\s+/g,'')}` + '@example.com',
+        messageText: msg || 'Hello Admin',
+        chatId: chatId || `chat_${Date.now()}`,
+        dashboardUrl: dashboardUrl || process.env.ADMIN_DASHBOARD_URL || 'https://www.eliteretoucher.com/admin',
+        sentAt: new Date().toISOString()
+      });
+    } else {
+      console.log('📧 Testing Mailtrap welcome email...');
+      console.log('  → Recipient:', to);
+      console.log('  → Name     :', name);
+      await sendWelcomeEmail(to, name);
+    }
+
     console.log('✅ Test email sent. Check your Mailtrap inbox.');
     process.exit(0);
   } catch (error) {

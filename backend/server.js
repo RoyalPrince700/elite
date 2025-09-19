@@ -24,6 +24,7 @@ import payPerImageRoutes from './routes/payPerImage.js';
 import Chat from './models/Chat.js';
 import Message from './models/Message.js';
 import User from './models/User.js';
+import { sendChatNotificationToAdmin, sendChatNotificationToUser } from './mailtrap/emails.js';
 
 // Environment variables are loaded via `dotenv/config` import above
 
@@ -208,8 +209,52 @@ io.on('connection', (socket) => {
       await newMessage.populate('sender', 'fullName email avatar');
       console.log(`📤 [Socket] Message populated with sender info`);
 
-      // Email notifications removed
-      console.log('DEBUG: Email notifications disabled');
+      // Email notifications
+      try {
+        const chat = await Chat.findById(chatId).populate('user', 'fullName email').populate('admin', 'fullName email');
+        const senderUser = await User.findById(socket.userId).select('fullName email role');
+        const isAdminSender = senderUser?.role === 'admin' || socket.userRole === 'admin';
+
+        if (!isAdminSender) {
+          // Notify admin via configured single email if provided
+          const configuredAdminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+          const targetAdminEmail = configuredAdminEmail || chat?.admin?.email;
+          const adminData = {
+            userFullName: chat?.user?.fullName || 'User',
+            userEmail: chat?.user?.email || '',
+            messageText: message,
+            chatId: chatId,
+            dashboardUrl: process.env.ADMIN_DASHBOARD_URL || 'https://www.eliteretoucher.com/admin',
+            sentAt: newMessage.createdAt
+          };
+
+          if (targetAdminEmail) {
+            await sendChatNotificationToAdmin(targetAdminEmail, adminData);
+          } else {
+            // No assigned admin: notify all active admins
+            const admins = await User.find({ role: 'admin', isActive: true }).select('email');
+            const emailPromises = admins
+              .map(a => a?.email)
+              .filter(Boolean)
+              .map(email => sendChatNotificationToAdmin(email, adminData));
+            if (emailPromises.length) await Promise.allSettled(emailPromises);
+          }
+        } else {
+          // Notify user of admin reply
+          const userEmail = chat?.user?.email;
+          if (userEmail) {
+            await sendChatNotificationToUser(userEmail, {
+              adminFullName: senderUser?.fullName || 'Admin',
+              userFullName: chat?.user?.fullName || 'Customer',
+              messageText: message,
+              chatUrl: process.env.USER_DASHBOARD_URL || 'https://www.eliteretoucher.com/dashboard',
+              sentAt: newMessage.createdAt
+            });
+          }
+        }
+      } catch (emailErr) {
+        console.error('❌ [Socket] Email notification error:', emailErr?.message || emailErr);
+      }
       
       // Update chat's last message, timestamp and increment unread count for recipient
       const unreadField = socket.userRole === 'admin' ? 'unreadCount.user' : 'unreadCount.admin';

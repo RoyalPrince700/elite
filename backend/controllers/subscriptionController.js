@@ -2,6 +2,7 @@ import SubscriptionRequest from '../models/SubscriptionRequest.js';
 import Invoice from '../models/Invoice.js';
 import PaymentReceipt from '../models/PaymentReceipt.js';
 import Subscription from '../models/Subscription.js';
+import { sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendSubscriptionActivatedEmail } from '../mailtrap/emails.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
 import User from '../models/User.js';
@@ -94,6 +95,50 @@ export const createSubscriptionRequest = async (req, res, next) => {
       usdPrice: plan.monthlyPrice,
       finalPrice: requestFinalPrice || plan.monthlyPrice
     });
+
+    // Send receipt email to user
+    try {
+      await sendSubscriptionRequestReceiptEmail(req.user.email, {
+        fullName: req.user.fullName || req.user.name || req.user.email,
+        planName: plan.name,
+        billingCycle,
+        amount: requestFinalPrice || plan.monthlyPrice,
+        currency: currency || 'USD',
+        companyName,
+        contactPerson,
+        address
+      });
+    } catch (emailErr) {
+      console.error('⚠️ Failed to send subscription request receipt email:', emailErr.message);
+    }
+
+    // Notify admin of new subscription request
+    try {
+      const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'Eliteretoucher@gmail.com';
+      await sendAdminNotificationEmail(ADMIN_NOTIFICATION_EMAIL, 'New Subscription Request', {
+        requestId: subscriptionRequest._id,
+        createdAt: subscriptionRequest.createdAt,
+        user: {
+          id: req.user._id,
+          email: req.user.email,
+          fullName: req.user.fullName || req.user.name || ''
+        },
+        plan: {
+          id: planId,
+          name: plan.name,
+          monthlyPrice: plan.monthlyPrice
+        },
+        billingCycle,
+        currency: currency || 'USD',
+        amount: requestFinalPrice || plan.monthlyPrice,
+        companyName,
+        contactPerson,
+        phone,
+        address
+      });
+    } catch (adminEmailErr) {
+      console.error('⚠️ Failed to send admin notification email:', adminEmailErr.message);
+    }
 
     res.status(201).json({
       success: true,
@@ -565,6 +610,27 @@ export const submitPaymentReceipt = async (req, res, next) => {
 
     console.log('✅ [Receipt Submission] Payment receipt created successfully:', paymentReceipt._id);
 
+    // Notify admin that a payment receipt has been submitted and awaits confirmation
+    try {
+      const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'Eliteretoucher@gmail.com';
+
+      await sendAdminNotificationEmail(ADMIN_NOTIFICATION_EMAIL, 'Payment Receipt Submitted', {
+        requestId: paymentReceipt._id,
+        createdAt: paymentReceipt.createdAt,
+        user: {
+          id: req.user._id,
+          email: req.user.email,
+          fullName: req.user.fullName || req.user.name || ''
+        },
+        // Plan data may not be available here; include minimal invoice context
+        billingCycle: invoice?.billingCycle,
+        currency: invoice?.currency || 'USD',
+        amount: numericAmount
+      });
+    } catch (adminEmailErr) {
+      console.error('⚠️ Failed to send admin notification email for payment receipt:', adminEmailErr.message);
+    }
+
     console.log('🔍 [Receipt Submission] ===== SUCCESS RESPONSE =====');
     console.log('✅ [Receipt Submission] Sending success response');
 
@@ -770,7 +836,8 @@ export const confirmPayment = async (req, res, next) => {
     console.log('🔍 [Controller] Confirming payment for invoice ID:', invoiceId, typeof invoiceId);
 
     const invoice = await Invoice.findById(invoiceId)
-      .populate('subscriptionRequestId');
+      .populate('subscriptionRequestId')
+      .populate('userId', 'email fullName');
 
     console.log('🔍 [Controller] Invoice query result:', !!invoice);
 
@@ -845,8 +912,60 @@ export const confirmPayment = async (req, res, next) => {
       console.log('DEBUG: No subscription request found - this might be a pay-per-image invoice');
     }
 
-    // Email notifications removed
-    console.log('DEBUG: Email notifications disabled');
+    // Send activation email for subscription invoices (not pay-per-image)
+    try {
+      if (!isPayPerImageInvoice) {
+        // Fetch plan details
+        const plan = await SubscriptionPlan.findById(invoice.planId);
+
+        // Determine start and end dates
+        let startDate = invoice.paymentConfirmedAt || new Date();
+        let endDate = null;
+
+        // Prefer existing active subscription's period if available
+        const existingActive = await Subscription.findOne({ userId: invoice.userId, status: 'active' }).sort({ createdAt: -1 });
+        if (existingActive) {
+          startDate = existingActive.startDate || startDate;
+          endDate = existingActive.endDate || existingActive.calculatePeriodEndDate(existingActive.startDate || startDate);
+        } else {
+          // Compute end date from billing cycle
+          const cycle = invoice.billingCycle;
+          const s = new Date(startDate);
+          switch (cycle) {
+            case 'monthly':
+              endDate = new Date(s.getFullYear(), s.getMonth() + 1, s.getDate());
+              break;
+            case 'quarterly':
+              endDate = new Date(s.getFullYear(), s.getMonth() + 3, s.getDate());
+              break;
+            case 'yearly':
+              endDate = new Date(s.getFullYear() + 1, s.getMonth(), s.getDate());
+              break;
+            default:
+              endDate = new Date(s.getFullYear(), s.getMonth() + 1, s.getDate());
+          }
+        }
+
+        const activationEmailData = {
+          fullName: invoice?.userId?.fullName || 'Customer',
+          planName: plan?.name || (invoice?.invoiceItems?.[0]?.description || 'Subscription'),
+          billingCycle: invoice.billingCycle,
+          currency: invoice.currency || 'USD',
+          amount: invoice.amount,
+          startDate,
+          endDate
+        };
+
+        const recipient = invoice?.userId?.email;
+        if (recipient) {
+          await sendSubscriptionActivatedEmail(recipient, activationEmailData);
+        } else {
+          console.warn('No recipient email found for subscription activation email on invoice', invoice._id);
+        }
+      }
+    } catch (emailErr) {
+      console.error('⚠️ Failed to send subscription activation email:', emailErr.message);
+    }
 
     console.log('🔍 [Controller] Payment confirmation completed successfully');
     res.json({

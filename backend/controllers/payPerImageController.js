@@ -1,6 +1,7 @@
 import PayPerImage from '../models/PayPerImage.js';
 import Invoice from '../models/Invoice.js';
 import User from '../models/User.js';
+import { sendInvoiceEmail } from '../mailtrap/emails.js';
 
 // @desc    Create pay-per-image request
 // @route   POST /api/pay-per-image/request
@@ -375,6 +376,32 @@ export const createPayPerImageInvoice = async (req, res, next) => {
     // Populate invoice data
     await invoice.populate('userId', 'fullName email');
     await invoice.populate('createdBy', 'fullName email');
+
+    // Send invoice email to user
+    try {
+      const invoiceEmailData = {
+        invoiceNumber: invoice.invoiceNumber,
+        date: invoice.createdAt ? new Date(invoice.createdAt).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+        dueDate: invoice.dueDate ? new Date(invoice.dueDate).toISOString().slice(0, 10) : undefined,
+        status: invoice.status,
+        items: (invoice.invoiceItems || []).map((item) => ({
+          description: item.description,
+          quantity: item.quantity,
+          price: item.unitPrice,
+          total: item.total
+        })),
+        totalAmount: invoice.amount
+      };
+
+      const userEmail = invoice?.userId?.email || request?.userId?.email;
+      if (userEmail) {
+        await sendInvoiceEmail(userEmail, invoiceEmailData);
+      } else {
+        console.warn('Pay-per-image invoice created but user email not found for invoice:', invoice._id);
+      }
+    } catch (emailError) {
+      console.error('Error sending pay-per-image invoice email:', emailError);
+    }
 
     res.status(201).json({
       success: true,

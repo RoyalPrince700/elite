@@ -2,6 +2,7 @@ import SubscriptionRequest from '../models/SubscriptionRequest.js';
 import Invoice from '../models/Invoice.js';
 import PaymentReceipt from '../models/PaymentReceipt.js';
 import User from '../models/User.js';
+import { sendInvoiceEmail } from '../mailtrap/emails.js';
 import Subscription from '../models/Subscription.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
@@ -225,6 +226,32 @@ export const createInvoice = async (req, res) => {
       { path: 'planId', select: 'name price' },
       { path: 'createdBy', select: 'fullName' }
     ]);
+
+    // Send invoice email to user (non-blocking for API response)
+    try {
+      const invoiceEmailData = {
+        invoiceNumber: invoice.invoiceNumber,
+        date: invoice.createdAt ? new Date(invoice.createdAt).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+        dueDate: invoice.dueDate ? new Date(invoice.dueDate).toISOString().slice(0, 10) : undefined,
+        status: invoice.status,
+        items: (invoice.invoiceItems || []).map((item) => ({
+          description: item.description,
+          quantity: item.quantity,
+          price: item.unitPrice,
+          total: item.total
+        })),
+        totalAmount: invoice.amount
+      };
+
+      const userEmail = invoice?.userId?.email;
+      if (userEmail) {
+        await sendInvoiceEmail(userEmail, invoiceEmailData);
+      } else {
+        console.warn('Invoice created but user email not found for invoice:', invoice._id);
+      }
+    } catch (emailError) {
+      console.error('Error sending invoice email:', emailError);
+    }
 
     res.status(201).json({
       success: true,
