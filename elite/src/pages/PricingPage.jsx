@@ -89,12 +89,11 @@ const PricingPage = () => {
 
   // Fixed NGN pricing for pay-per-image services
   const NGN_PAY_PER_IMAGE_OVERRIDES = {
-    "Natural Retouch (Basic)": 3000,
-    "High-End Retouch (Premium)": 5000,
+    "Natural Retouch (Basic)": 600,
+    "High-End Retouch (Premium)": 1500,
     "Magazine Retouch (Luxury)": 7000,
     "Basic Product": 3000,
     "Premium Product": 5000,
-    "Campaign Ready": 7000,
     "Advanced composites & manipulations": "Custom Quote"
   };
 
@@ -292,8 +291,8 @@ const PricingPage = () => {
     {
       category: "Portrait / Beauty Retouching",
       services: [
-        { name: "Natural Retouch (Basic)", price: 5, desc: "simple clean-up, natural skin", icon: Image },
-        { name: "High-End Retouch (Premium)", price: 10, desc: "detailed skin, tones, pro look", icon: Settings },
+        { name: "Natural Retouch (Basic)", price: 1, desc: "simple clean-up, natural skin", icon: Image },
+        { name: "High-End Retouch (Premium)", price: 3, desc: "detailed skin, tones, pro look", icon: Settings },
         { name: "Magazine Retouch (Luxury)", price: 20, desc: "editorial-level polish, advanced techniques", icon: Crown }
       ]
     },
@@ -301,8 +300,7 @@ const PricingPage = () => {
       category: "E-Commerce / Product Retouching",
       services: [
         { name: "Basic Product", price: 5, desc: "background removal + color correction", icon: Download },
-        { name: "Premium Product", price: 10, desc: "background removal + shadows/reflections", icon: BarChart3 },
-        { name: "Campaign Ready", price: 20, desc: "creative retouch, composites, lifestyle polish", icon: Zap }
+        { name: "Premium Product", price: 10, desc: "background removal + shadows/reflections", icon: BarChart3 }
       ]
     },
     {
@@ -327,7 +325,7 @@ const PricingPage = () => {
     {
       id: 'turnaround-time',
       question: 'What\'s the turnaround time?',
-      answer: 'Silver plan: 5 business days, Gold plan: 2-3 business days, Diamond plan: Same-day turnaround available. Rush services are available for an additional fee.'
+      answer: 'Silver Plan: Standard delivery within 72 hours (about 3 days).\nGold Plan: Also 72 hours, but can be completed in 48 hours when needed.\nDiamond Plan: Highest priority—typically 24 hours when required.\nPay per image: Standard Delivery within 72 hrs\nRush delivery is available for an additional fee'
     },
     {
       id: 'change-cancel',
