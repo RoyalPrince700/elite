@@ -2,6 +2,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import User from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
+import { sendWelcomeEmail } from '../mailtrap/emails.js';
 
 // Google OAuth Strategy
 passport.use(
@@ -35,6 +36,17 @@ passport.use(
             isEmailVerified: true, // Google accounts are pre-verified
           });
           console.log('✅ [Passport] New user created:', user._id);
+
+          // Send welcome email for first-time Google signup (non-blocking)
+          try {
+            const recipientEmail = user.email;
+            const recipientName = user.fullName || 'there';
+            sendWelcomeEmail(recipientEmail, recipientName)
+              .then(() => console.log('📧 [Passport] Welcome email queued/sent for', recipientEmail))
+              .catch(err => console.error('❌ [Passport] Failed to send welcome email:', err.message));
+          } catch (e) {
+            console.error('❌ [Passport] Error triggering welcome email:', e);
+          }
         } else {
           console.log('🔄 [Passport] Existing user found, checking avatar...');
           // Update user's Google info if needed
