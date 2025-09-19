@@ -6,7 +6,6 @@ import Subscription from '../models/Subscription.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
 import Photo from '../models/Photo.js';
-import { sendPhotoReadyEmail } from '../services/emailService.js';
 
 // Get admin dashboard statistics
 export const getAdminDashboardStats = async (req, res) => {
@@ -957,21 +956,8 @@ export const updatePhotoStatus = async (req, res) => {
 
     await photo.save();
 
-    // Send email notification if photo is completed
-    if (status === 'completed' && photo.userId) {
-      try {
-        await sendPhotoReadyEmail(
-          photo.userId.email,
-          photo.userId.fullName,
-          photo._id.toString(),
-          photo.originalFilename
-        );
-        console.log(`📧 Photo ready email sent to ${photo.userId.email} for photo ${photo._id}`);
-      } catch (emailError) {
-        console.error('❌ Failed to send photo ready email:', emailError.message);
-        // Don't fail the status update if email fails
-      }
-    }
+    // Email notifications removed
+    console.log('DEBUG: Email notifications disabled');
 
     res.json({
       success: true,

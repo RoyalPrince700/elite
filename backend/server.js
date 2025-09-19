@@ -10,8 +10,7 @@ import connectDB from './config/database.js';
 import passport from './config/passport.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
-// Import services
-import { sendChatMessageNotification } from './services/emailService.js';
+// Email services removed
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -20,7 +19,6 @@ import subscriptionRoutes from './routes/subscriptions.js';
 import adminRoutes from './routes/admin.js';
 import chatRoutes from './routes/chat.js';
 import payPerImageRoutes from './routes/payPerImage.js';
-import emailRoutes from './routes/email.js';
 
 // Import models
 import Chat from './models/Chat.js';
@@ -105,8 +103,7 @@ console.log('🔍 [Server] Chat routes mounted');
 app.use('/api/pay-per-image', payPerImageRoutes);
 console.log('🔍 [Server] Pay-per-image routes mounted');
 
-app.use('/api/email', emailRoutes);
-console.log('🔍 [Server] Email routes mounted');
+// Email routes removed
 
 // Welcome route
 app.get('/', (req, res) => {
@@ -120,7 +117,6 @@ app.get('/', (req, res) => {
       subscriptions: '/api/subscriptions',
       'pay-per-image': '/api/pay-per-image',
       admin: '/api/admin',
-      email: '/api/email',
       health: '/health'
     }
   });
@@ -212,45 +208,8 @@ io.on('connection', (socket) => {
       await newMessage.populate('sender', 'fullName email avatar');
       console.log(`📤 [Socket] Message populated with sender info`);
 
-      // Send email notifications
-      try {
-        const chat = await Chat.findById(chatId).populate('user', 'fullName email').populate('admin', 'fullName email');
-        if (chat) {
-          const sender = await User.findById(socket.userId).select('fullName role');
-
-          if (socket.userRole === 'admin') {
-            // Admin sent message to user - notify user
-            if (chat.user && chat.user.email) {
-              await sendChatMessageNotification(
-                chat.user.email,
-                sender.fullName || 'Admin',
-                chat.user.fullName,
-                message,
-                chatId
-              );
-              console.log(`📧 [Email] Chat notification sent to user: ${chat.user.email}`);
-            }
-          } else {
-            // User sent message - notify all admins
-            const admins = await User.find({ role: 'admin', isActive: true }).select('fullName email');
-            for (const admin of admins) {
-              if (admin.email) {
-                await sendChatMessageNotification(
-                  admin.email,
-                  chat.user.fullName,
-                  admin.fullName || 'Admin',
-                  message,
-                  chatId
-                );
-                console.log(`📧 [Email] Chat notification sent to admin: ${admin.email}`);
-              }
-            }
-          }
-        }
-      } catch (emailError) {
-        console.error('❌ [Email] Failed to send chat notification:', emailError.message);
-        // Don't fail the message sending if email fails
-      }
+      // Email notifications removed
+      console.log('DEBUG: Email notifications disabled');
       
       // Update chat's last message, timestamp and increment unread count for recipient
       const unreadField = socket.userRole === 'admin' ? 'unreadCount.user' : 'unreadCount.admin';

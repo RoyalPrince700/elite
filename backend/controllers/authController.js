@@ -3,7 +3,7 @@ import User from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { sendWelcomeEmail, sendPasswordResetEmail } from '../services/emailService.js';
+import { sendWelcomeEmail } from '../mailtrap/emails.js';
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -45,14 +45,8 @@ export const register = async (req, res, next) => {
     // Generate token
     const token = generateToken(user._id);
 
-    // Send welcome email (don't block registration if email fails)
-    try {
-      await sendWelcomeEmail(user.email, user.fullName);
-      console.log(`📧 Welcome email sent to ${user.email}`);
-    } catch (emailError) {
-      console.error('❌ Failed to send welcome email:', emailError.message);
-      // Don't fail registration if email fails
-    }
+    // Email notifications removed
+    console.log('DEBUG: Email notifications disabled');
 
     res.status(201).json({
       success: true,
@@ -279,19 +273,8 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
     await user.save();
 
-    // Send password reset email
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-    try {
-      await sendPasswordResetEmail(user.email, user.fullName, resetUrl);
-      console.log(`📧 Password reset email sent to ${user.email}`);
-    } catch (emailError) {
-      console.error('❌ Failed to send password reset email:', emailError.message);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to send password reset email. Please try again later.'
-      });
-    }
+    // Email notifications removed
+    console.log('DEBUG: Email notifications disabled');
 
     res.json({
       success: true,
@@ -400,13 +383,15 @@ export const googleAuth = async (req, res, next) => {
       });
       console.log('✅ [AuthController] New user created:', user._id);
 
-      // Send welcome email for new Google users (don't block auth if email fails)
+      // Send welcome email for first-time Google signup (non-blocking)
       try {
-        await sendWelcomeEmail(user.email, user.fullName);
-        console.log(`📧 Welcome email sent to ${user.email} (Google auth)`);
-      } catch (emailError) {
-        console.error('❌ Failed to send welcome email for Google user:', emailError.message);
-        // Don't fail authentication if email fails
+        const recipientEmail = user.email;
+        const recipientName = user.fullName || 'there';
+        sendWelcomeEmail(recipientEmail, recipientName)
+          .then(() => console.log('📧 Welcome email queued/sent for', recipientEmail))
+          .catch(err => console.error('❌ Failed to send welcome email:', err.message));
+      } catch (e) {
+        console.error('❌ Error triggering welcome email:', e);
       }
     } else {
       console.log('🔄 [AuthController] Existing user found, checking avatar...');

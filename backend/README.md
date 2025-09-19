@@ -110,6 +110,10 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-email-password
+
+# Mailtrap (transactional emails)
+MAILTRAP_TOKEN=your-mailtrap-token
+MAILTRAP_ENDPOINT=https://send.api.mailtrap.io
 ```
 
 ## 📡 API Endpoints

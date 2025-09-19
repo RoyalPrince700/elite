@@ -8,17 +8,17 @@ A modern, fast-loading website for high-end photo retouching services, built wit
 - **Fast & Interactive**: Optimized for speed with smooth animations and engaging visuals
 - **Professional Design**: High-end, minimal design aligned with luxury photography services
 - **Mobile Responsive**: Perfect experience across all devices (desktop, tablet, mobile)
-- **Modern Stack**: Built with Vite + React + Tailwind CSS + Supabase
+- **Modern Stack**: Built with Vite + React + Tailwind CSS + Node.js/Express/MongoDB
 
 ### Key Pages & Components
 - **Landing Page**: Hero section with before/after showcase, service overview, and clear CTAs
 - **Service Models**: Pay-per-image vs Subscription comparison
 - **Interactive Portfolio**: Before/after sliders showcasing retouching quality
-- **Subscription Management**: Client dashboard for usage tracking and photo uploads
+- **Subscription Management**: Client dashboard with subscription requests, invoice management, and manual payment tracking
 - **Complete Pages**: About, Contact, FAQ, and Portfolio galleries
 
 ### Technical Features
-- **Supabase Integration**: Backend services for user management and data storage
+- **Backend API Integration**: Node.js/Express backend with MongoDB for user management and Cloudinary for image storage
 - **Framer Motion**: Smooth animations and transitions
 - **Tailwind CSS**: Utility-first styling for rapid development
 - **React Router**: Client-side routing for seamless navigation
@@ -28,7 +28,7 @@ A modern, fast-loading website for high-end photo retouching services, built wit
 
 - **Frontend**: React 19.1.1, Vite 7.1.2
 - **Styling**: Tailwind CSS 3.x
-- **Backend**: Supabase
+- **Backend**: Node.js/Express with MongoDB and Cloudinary
 - **Animations**: Framer Motion
 - **Routing**: React Router DOM
 - **Icons**: Lucide React
@@ -51,10 +51,10 @@ A modern, fast-loading website for high-end photo retouching services, built wit
    ```bash
    cp .env.example .env
    ```
-   Fill in your Supabase credentials in the `.env` file:
+   Fill in your backend API configuration in the `.env` file:
    ```
-   VITE_SUPABASE_URL=your-supabase-url-here
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key-here
+   VITE_API_URL=http://localhost:5000/api
+   VITE_CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
    ```
 
 4. **Start development server**
@@ -93,7 +93,8 @@ src/
 │   ├── Pricing.jsx     # Subscription pricing
 │   └── ...
 ├── config/             # Configuration files
-│   └── supabase.js     # Supabase client setup
+│   ├── api.js          # Backend API client setup
+│   └── cloudinary.js   # Cloudinary configuration
 ├── App.jsx             # Main app component with routing
 ├── App.css             # Global styles
 ├── index.css           # Tailwind imports and base styles
@@ -125,11 +126,11 @@ The project uses a custom Tailwind configuration with:
 - Typography scale optimized for photography content
 - Responsive breakpoints
 
-### Supabase Setup
-1. Create a new Supabase project
-2. Set up authentication (if needed)
-3. Create tables for user management and subscription tracking
-4. Add your credentials to `.env` file
+### Backend API Setup
+1. Ensure your Node.js/Express backend is running (see backend README)
+2. Set up MongoDB database connection
+3. Configure Cloudinary for image storage
+4. Add your API URL and Cloudinary credentials to `.env` file
 
 ## 📱 Responsive Design
 

@@ -5,7 +5,6 @@ import Subscription from '../models/Subscription.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
 import User from '../models/User.js';
-import { sendSubscriptionConfirmationEmail, sendPaymentReceivedEmail } from '../services/emailService.js';
 
 // @desc    Create subscription request
 // @route   POST /api/subscriptions/request
@@ -846,37 +845,8 @@ export const confirmPayment = async (req, res, next) => {
       console.log('DEBUG: No subscription request found - this might be a pay-per-image invoice');
     }
 
-    // Send subscription confirmation email (only for regular subscriptions)
-    if (invoice.subscriptionRequestId) {
-      try {
-        console.log('DEBUG: Attempting to send confirmation email');
-        const user = await User.findById(invoice.userId);
-        const plan = await SubscriptionPlan.findById(invoice.planId);
-
-        console.log('DEBUG: Email data:', {
-          user: user ? user.email : 'User not found',
-          plan: plan ? plan.name : 'Plan not found'
-        });
-
-        if (user && plan) {
-          await sendSubscriptionConfirmationEmail(
-            user.email,
-            user.fullName,
-            plan.name,
-            invoice.amount,
-            new Date()
-          );
-          console.log(`📧 Subscription confirmation email sent to ${user.email}`);
-        } else {
-          console.log('DEBUG: Skipping email - user or plan not found');
-        }
-      } catch (emailError) {
-        console.error('❌ Failed to send subscription confirmation email:', emailError.message);
-        // Don't fail the payment confirmation if email fails
-      }
-    } else {
-      console.log('DEBUG: Skipping email for pay-per-image invoice');
-    }
+    // Email notifications removed
+    console.log('DEBUG: Email notifications disabled');
 
     console.log('🔍 [Controller] Payment confirmation completed successfully');
     res.json({
@@ -997,22 +967,8 @@ export const processPaymentReceipt = async (req, res, next) => {
       receipt.invoiceId.paidAt = new Date();
       await receipt.invoiceId.save();
 
-      // Send payment received email
-      try {
-        const user = await User.findById(receipt.userId);
-        if (user) {
-          await sendPaymentReceivedEmail(
-            user.email,
-            user.fullName,
-            receipt.amount,
-            receipt.transactionReference || receipt._id.toString()
-          );
-          console.log(`📧 Payment received email sent to ${user.email}`);
-        }
-      } catch (emailError) {
-        console.error('❌ Failed to send payment received email:', emailError.message);
-        // Don't fail the payment processing if email fails
-      }
+      // Email notifications removed
+      console.log('DEBUG: Email notifications disabled');
     }
 
     await receipt.save();
