@@ -387,4 +387,5 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
+export { io };
 export default app;

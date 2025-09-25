@@ -1,11 +1,11 @@
 import 'dotenv/config';
-import { sendWelcomeEmail, sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendInvoiceEmail, sendSubscriptionActivatedEmail, sendChatNotificationToUser, sendChatNotificationToAdmin } from '../mailtrap/emails.js';
+import { sendWelcomeEmail, sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendInvoiceEmail, sendSubscriptionActivatedEmail, sendChatNotificationToUser, sendChatNotificationToAdmin, sendPayPerImageActivatedEmail } from '../mailtrap/emails.js';
 
 function parseArgs(argv) {
   const args = {
     to: 'test@example.com',
     name: 'Test User',
-    template: 'subscription', // subscription | welcome | admin | invoice | activated | chat-user | chat-admin
+    template: 'subscription', // subscription | welcome | admin | invoice | activated | chat-user | chat-admin | ppi-activated
     plan: 'Gold Plan',
     cycle: 'monthly', // monthly | yearly
     amount: '197',
@@ -30,7 +30,12 @@ function parseArgs(argv) {
     admin: 'Admin',
     chatId: '',
     chatUrl: '',
-    dashboardUrl: ''
+    dashboardUrl: '',
+    // pay-per-image specific
+    serviceName: 'Portrait Retouching',
+    qty: '10',
+    unit: '20',
+    total: '200'
   };
   // Positional args support: node script.js <email> <name>
   if (argv[2] && !argv[2].startsWith('--')) {
@@ -109,6 +114,15 @@ function parseArgs(argv) {
     if (part.startsWith('--chatUrl=')) { args.chatUrl = part.split('=')[1]; continue; }
     if (part === '--dashboardUrl' && argv[i + 1]) { args.dashboardUrl = argv[i + 1]; i++; continue; }
     if (part.startsWith('--dashboardUrl=')) { args.dashboardUrl = part.split('=')[1]; continue; }
+    // ppi args
+    if (part === '--service' && argv[i + 1]) { args.serviceName = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--service=')) { args.serviceName = part.split('=')[1]; continue; }
+    if (part === '--qty' && argv[i + 1]) { args.qty = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--qty=')) { args.qty = part.split('=')[1]; continue; }
+    if (part === '--unit' && argv[i + 1]) { args.unit = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--unit=')) { args.unit = part.split('=')[1]; continue; }
+    if (part === '--total' && argv[i + 1]) { args.total = argv[i + 1]; i++; continue; }
+    if (part.startsWith('--total=')) { args.total = part.split('=')[1]; continue; }
   }
   return args;
 }
@@ -119,7 +133,8 @@ async function main() {
       to, name, template, plan, cycle, amount, currency, company, contact, type, requestId,
       start, end,
       invoiceNumber, invDate, invDue, invStatus, itemDesc, itemQty, itemPrice, itemsJson,
-      msg, admin, chatId, chatUrl, dashboardUrl
+      msg, admin, chatId, chatUrl, dashboardUrl,
+      serviceName, qty, unit, total
     } = parseArgs(process.argv);
 
     if (template === 'subscription') {
@@ -264,6 +279,28 @@ async function main() {
         chatId: chatId || `chat_${Date.now()}`,
         dashboardUrl: dashboardUrl || process.env.ADMIN_DASHBOARD_URL || 'https://www.eliteretoucher.com/admin',
         sentAt: new Date().toISOString()
+      });
+    } else if (template === 'ppi-activated') {
+      console.log('📧 Testing Pay-per-Image ACTIVATED email...');
+      console.log('  → Recipient   :', to);
+      console.log('  → Name        :', name);
+      console.log('  → Service     :', serviceName);
+      console.log('  → Quantity    :', qty);
+      console.log('  → Unit Price  :', unit);
+      console.log('  → Total Price :', total);
+      console.log('  → Currency    :', currency);
+
+      const qNum = isNaN(Number(qty)) ? 1 : Number(qty);
+      const uNum = isNaN(Number(unit)) ? unit : Number(unit);
+      const tNum = isNaN(Number(total)) ? total : Number(total);
+      await sendPayPerImageActivatedEmail(to, {
+        fullName: name,
+        serviceName,
+        quantity: qNum,
+        currency,
+        unitPrice: uNum,
+        totalPrice: tNum,
+        activatedAt: new Date().toISOString()
       });
     } else {
       console.log('📧 Testing Mailtrap welcome email...');

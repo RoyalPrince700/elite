@@ -2,7 +2,7 @@ import SubscriptionRequest from '../models/SubscriptionRequest.js';
 import Invoice from '../models/Invoice.js';
 import PaymentReceipt from '../models/PaymentReceipt.js';
 import Subscription from '../models/Subscription.js';
-import { sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendSubscriptionActivatedEmail } from '../mailtrap/emails.js';
+import { sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendSubscriptionActivatedEmail, sendPayPerImageActivatedEmail } from '../mailtrap/emails.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
 import User from '../models/User.js';
@@ -887,6 +887,50 @@ export const confirmPayment = async (req, res, next) => {
         await payPerImageRequest.save();
 
         console.log('🔍 [Controller] Pay-per-image request updated successfully');
+
+        // Send activation email to user
+        try {
+          const recipient = invoice?.userId?.email;
+          if (recipient) {
+            await sendPayPerImageActivatedEmail(recipient, {
+              fullName: invoice?.userId?.fullName || 'Customer',
+              serviceName: payPerImageRequest.serviceName,
+              quantity: payPerImageRequest.quantity,
+              currency: payPerImageRequest.currency || invoice.currency || 'USD',
+              unitPrice: payPerImageRequest.unitPrice,
+              totalPrice: payPerImageRequest.totalPrice,
+              activatedAt: payPerImageRequest.paidAt
+            });
+          } else {
+            console.warn('No recipient email found for pay-per-image activation on invoice', invoice._id);
+          }
+        } catch (emailErr) {
+          console.error('⚠️ Failed to send pay-per-image activation email:', emailErr.message);
+        }
+
+        // Notify admin
+        try {
+          const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'Eliteretoucher@gmail.com';
+          await sendAdminNotificationEmail(ADMIN_NOTIFICATION_EMAIL, 'Pay-per-image Activated', {
+            requestId: payPerImageRequest._id,
+            createdAt: payPerImageRequest.createdAt,
+            user: {
+              id: invoice.userId?._id,
+              email: invoice.userId?.email,
+              fullName: invoice.userId?.fullName || ''
+            },
+            plan: { name: payPerImageRequest.serviceName },
+            billingCycle: 'one-time',
+            currency: payPerImageRequest.currency || invoice.currency || 'USD',
+            amount: payPerImageRequest.totalPrice,
+            companyName: payPerImageRequest.companyName,
+            contactPerson: payPerImageRequest.contactPerson,
+            phone: payPerImageRequest.phone,
+            address: payPerImageRequest.address
+          });
+        } catch (adminEmailErr) {
+          console.error('⚠️ Failed to send admin pay-per-image activation email:', adminEmailErr.message);
+        }
       } else {
         console.log('🔍 [Controller] No pay-per-image request found for this invoice');
       }

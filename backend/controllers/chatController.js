@@ -1,6 +1,7 @@
 import Chat from '../models/Chat.js';
 import Message from '../models/Message.js';
 import User from '../models/User.js';
+import { io } from '../server.js';
 
 // Get or create chat for user
 export const getOrCreateChat = async (req, res) => {
@@ -238,6 +239,61 @@ export const markMessagesAsRead = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error marking messages as read'
+    });
+  }
+};
+
+// Create chat for specific user (admin only)
+export const createChatForUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const adminId = req.user.id;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if chat already exists
+    let chat = await Chat.findOne({ user: userId, isActive: true });
+    const isNewChat = !chat;
+
+    if (!chat) {
+      // Create new chat
+      chat = new Chat({ user: userId });
+      await chat.save();
+
+      // Populate the chat
+      chat = await Chat.findById(chat._id)
+        .populate('user', 'fullName email avatar')
+        .populate('admin', 'fullName email avatar');
+    }
+
+    // Assign admin to chat if not already assigned
+    if (!chat.admin) {
+      chat.admin = adminId;
+      await chat.save();
+
+      // Populate again after admin assignment
+      chat = await Chat.findById(chat._id)
+        .populate('user', 'fullName email avatar')
+        .populate('admin', 'fullName email avatar');
+    }
+
+    res.json({
+      success: true,
+      chat,
+      isNewChat
+    });
+  } catch (error) {
+    console.error('Error creating chat for user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating chat for user'
     });
   }
 };

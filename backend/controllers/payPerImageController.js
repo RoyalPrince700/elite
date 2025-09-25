@@ -1,7 +1,12 @@
 import PayPerImage from '../models/PayPerImage.js';
 import Invoice from '../models/Invoice.js';
 import User from '../models/User.js';
-import { sendInvoiceEmail } from '../mailtrap/emails.js';
+import {
+  sendInvoiceEmail,
+  sendPayPerImageActivatedEmail,
+  sendAdminNotificationEmail,
+  sendSubscriptionRequestReceiptEmail
+} from '../mailtrap/emails.js';
 
 // @desc    Create pay-per-image request
 // @route   POST /api/pay-per-image/request
@@ -85,6 +90,50 @@ export const createPayPerImageRequest = async (req, res, next) => {
 
     // Populate user info
     await payPerImageRequest.populate('userId', 'fullName email');
+
+    const userEmail = payPerImageRequest.email || payPerImageRequest.userId?.email;
+    if (userEmail) {
+      try {
+        await sendSubscriptionRequestReceiptEmail(userEmail, {
+          fullName: payPerImageRequest.userId?.fullName || payPerImageRequest.contactPerson || userEmail,
+          planName: payPerImageRequest.serviceName,
+          billingCycle: 'one-time',
+          amount: payPerImageRequest.totalPrice,
+          currency: payPerImageRequest.currency,
+          companyName: payPerImageRequest.companyName,
+          contactPerson: payPerImageRequest.contactPerson,
+          address: payPerImageRequest.address
+        });
+      } catch (receiptEmailErr) {
+        console.error('⚠️ Failed to send pay-per-image request receipt email:', receiptEmailErr.message);
+      }
+    }
+
+    const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'Eliteretoucher@gmail.com';
+    try {
+      await sendAdminNotificationEmail(ADMIN_NOTIFICATION_EMAIL, 'New Pay-Per-Image Request', {
+        requestId: payPerImageRequest._id,
+        createdAt: payPerImageRequest.createdAt,
+        user: {
+          id: req.user._id,
+          email: userEmail,
+          fullName: payPerImageRequest.userId?.fullName || ''
+        },
+        plan: {
+          name: payPerImageRequest.serviceName,
+          id: payPerImageRequest.serviceType
+        },
+        billingCycle: 'one-time',
+        currency: payPerImageRequest.currency,
+        amount: payPerImageRequest.totalPrice,
+        companyName: payPerImageRequest.companyName,
+        contactPerson: payPerImageRequest.contactPerson,
+        phone: payPerImageRequest.phone,
+        address: payPerImageRequest.address
+      });
+    } catch (adminEmailErr) {
+      console.error('⚠️ Failed to send admin pay-per-image request email:', adminEmailErr.message);
+    }
 
     res.status(201).json({
       success: true,
@@ -443,15 +492,10 @@ export const updatePayPerImagePaymentStatus = async (req, res, next) => {
       updateData.paidAt = new Date();
       // Initialize usage tracking when payment is confirmed
       updateData.imagesUsed = 0;
-      updateData.imagesRemaining = request.quantity;
+      // request is not yet loaded here; we'll set imagesRemaining after fetching the document
     }
 
-    const request = await PayPerImage.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    ).populate('userId', 'fullName email');
-
+    let request = await PayPerImage.findById(req.params.id).populate('userId', 'fullName email');
     if (!request) {
       return res.status(404).json({
         success: false,
@@ -459,12 +503,62 @@ export const updatePayPerImagePaymentStatus = async (req, res, next) => {
       });
     }
 
-    // Check if user owns this request or is admin
+    // Authorization check before mutation
     if (request.userId._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to update this request'
       });
+    }
+
+    // Apply updates
+    Object.assign(request, updateData);
+    if (paymentStatus === 'paid') {
+      request.imagesRemaining = request.quantity;
+    }
+    await request.save();
+
+    // Send emails on successful payment
+    if (paymentStatus === 'paid') {
+      try {
+        const userEmail = request?.userId?.email;
+        if (userEmail) {
+          await sendPayPerImageActivatedEmail(userEmail, {
+            fullName: request?.userId?.fullName || 'Customer',
+            serviceName: request.serviceName,
+            quantity: request.quantity,
+            currency: request.currency || 'USD',
+            unitPrice: request.unitPrice,
+            totalPrice: request.totalPrice,
+            activatedAt: request.paidAt
+          });
+        }
+      } catch (emailErr) {
+        console.error('⚠️ Failed to send pay-per-image activation email (manual status update):', emailErr.message);
+      }
+
+      try {
+        const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'Eliteretoucher@gmail.com';
+        await sendAdminNotificationEmail(ADMIN_NOTIFICATION_EMAIL, 'Pay-per-image Activated', {
+          requestId: request._id,
+          createdAt: request.createdAt,
+          user: {
+            id: request.userId?._id,
+            email: request.userId?.email,
+            fullName: request.userId?.fullName || ''
+          },
+          plan: { name: request.serviceName },
+          billingCycle: 'one-time',
+          currency: request.currency || 'USD',
+          amount: request.totalPrice,
+          companyName: request.companyName,
+          contactPerson: request.contactPerson,
+          phone: request.phone,
+          address: request.address
+        });
+      } catch (adminEmailErr) {
+        console.error('⚠️ Failed to send admin pay-per-image activation email (manual status update):', adminEmailErr.message);
+      }
     }
 
     res.status(200).json({

@@ -121,17 +121,34 @@ const SubscriptionPlansSection = ({
                 }`}>
                   <h4 className={`text-sm font-semibold uppercase tracking-wide mb-2 ${
                     plan.popular ? 'text-blue-200' : 'text-blue-600'
-                  }`}>{subscriptionCurrency === 'NGN' ? 'Included Allocation' : 'Value Breakdown'}</h4>
+                  }`}>Value Breakdown</h4>
                   {subscriptionCurrency === 'NGN' ? (
-                    <div className="space-y-1 text-sm">
-                      {(NGN_PLAN_OVERRIDES[plan._id]?.getBreakdown ? 
-                        NGN_PLAN_OVERRIDES[plan._id].getBreakdown(billingCycle) : 
+                    <div className="space-y-2">
+                      {(NGN_PLAN_OVERRIDES[plan._id]?.getBreakdown ?
+                        NGN_PLAN_OVERRIDES[plan._id].getBreakdown(billingCycle) :
                         NGN_PLAN_OVERRIDES[plan._id]?.breakdown || []
-                      ).map((b, i) => (
-                        <div key={i} className={`${plan.popular ? 'text-blue-100' : 'text-blue-700'}`}>
-                          {b.count} {b.type}
+                      ).map((item, i) => (
+                        <div key={i} className="flex justify-between text-sm">
+                          <span className={`${plan.popular ? 'text-blue-100' : 'text-blue-700'}`}>{item.count} {item.type}</span>
+                          {typeof item.value === 'number' && (
+                            <span className={`${plan.popular ? 'text-blue-200' : 'text-blue-600'}`}>{formatPrice(item.value)}</span>
+                          )}
                         </div>
                       ))}
+                      <div className={`border-t pt-2 mt-2 flex justify-between font-semibold ${
+                        plan.popular ? 'border-blue-400' : 'border-blue-200'
+                      }`}>
+                        <span className={`${plan.popular ? 'text-blue-100' : 'text-blue-800'}`}>Retail Value</span>
+                        <span className={`${plan.popular ? 'text-white' : 'text-blue-900'}`}>
+                          {formatPrice(NGN_PLAN_OVERRIDES[plan._id]?.retailValue || 0)}
+                        </span>
+                      </div>
+                      <div className={`flex justify-between font-semibold ${
+                        plan.popular ? 'text-green-300' : 'text-green-600'
+                      }`}>
+                        <span>You Save</span>
+                        <span>{formatPrice(NGN_PLAN_OVERRIDES[plan._id]?.savings || 0)}</span>
+                      </div>
                     </div>
                   ) : (
                     <div className="space-y-2">

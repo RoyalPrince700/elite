@@ -46,44 +46,69 @@ const PricingPage = () => {
     'silver-plan': {
       monthlyPrice: 90000,
       images: 30,
+      // Monthly value breakdown in NGN
       breakdown: [
-        { type: 'Basic', count: 20 },
-        { type: 'Pro', count: 5 },
-        { type: 'Highend', count: 5 }
+        { type: 'Natural', count: 15, value: 45000 },
+        { type: 'High-End', count: 10, value: 50000 },
+        { type: 'Magazine', count: 5, value: 35000 }
       ],
-      getBreakdown: (billingCycle) => [
-        { type: 'Basic', count: billingCycle === 'annual' ? 240 : 20 },
-        { type: 'Pro', count: billingCycle === 'annual' ? 60 : 5 },
-        { type: 'Highend', count: billingCycle === 'annual' ? 60 : 5 }
-      ]
+      retailValue: 130000,
+      savings: 40000,
+      getBreakdown: (billingCycle) => {
+        const items = [
+          { type: 'Natural', count: 15, value: 45000 },
+          { type: 'High-End', count: 10, value: 50000 },
+          { type: 'Magazine', count: 5, value: 35000 }
+        ];
+        if (billingCycle === 'annual') {
+          return items.map(i => ({ type: i.type, count: i.count * 12, value: i.value * 12 }));
+        }
+        return items;
+      }
     },
     'gold-plan': {
       monthlyPrice: 120000,
       images: 60,
       breakdown: [
-        { type: 'Basic', count: 30 },
-        { type: 'Pro', count: 20 },
-        { type: 'Highend', count: 10 }
+        { type: 'Natural', count: 30, value: 90000 },
+        { type: 'High-End', count: 25, value: 125000 },
+        { type: 'Magazine', count: 5, value: 35000 }
       ],
-      getBreakdown: (billingCycle) => [
-        { type: 'Basic', count: billingCycle === 'annual' ? 360 : 30 },
-        { type: 'Pro', count: billingCycle === 'annual' ? 240 : 20 },
-        { type: 'Highend', count: billingCycle === 'annual' ? 120 : 10 }
-      ]
+      retailValue: 250000,
+      savings: 130000,
+      getBreakdown: (billingCycle) => {
+        const items = [
+          { type: 'Natural', count: 30, value: 90000 },
+          { type: 'High-End', count: 25, value: 125000 },
+          { type: 'Magazine', count: 5, value: 35000 }
+        ];
+        if (billingCycle === 'annual') {
+          return items.map(i => ({ type: i.type, count: i.count * 12, value: i.value * 12 }));
+        }
+        return items;
+      }
     },
     'diamond-plan': {
       monthlyPrice: 200000,
       images: 150,
       breakdown: [
-        { type: 'Basic', count: 70 },
-        { type: 'Pro', count: 60 },
-        { type: 'Highend', count: 20 }
+        { type: 'Natural', count: 75, value: 225000 },
+        { type: 'High-End', count: 60, value: 300000 },
+        { type: 'Magazine', count: 15, value: 105000 }
       ],
-      getBreakdown: (billingCycle) => [
-        { type: 'Basic', count: billingCycle === 'annual' ? 840 : 70 },
-        { type: 'Pro', count: billingCycle === 'annual' ? 720 : 60 },
-        { type: 'Highend', count: billingCycle === 'annual' ? 240 : 20 }
-      ]
+      retailValue: 630000,
+      savings: 430000,
+      getBreakdown: (billingCycle) => {
+        const items = [
+          { type: 'Natural', count: 75, value: 225000 },
+          { type: 'High-End', count: 60, value: 300000 },
+          { type: 'Magazine', count: 15, value: 105000 }
+        ];
+        if (billingCycle === 'annual') {
+          return items.map(i => ({ type: i.type, count: i.count * 12, value: i.value * 12 }));
+        }
+        return items;
+      }
     }
   };
 
@@ -159,29 +184,29 @@ const PricingPage = () => {
       bestFor: "Freelancers, new photographers",
       notes: "Entry-level option to try the service.",
       popular: false,
-      savings: "$163 (~14% off)", // 97*12 - 989 = 1164 - 989 = 175, but showing effective savings
+      savings: "$178 (~15% off)",
       effectiveRate: "$2.75/image", // 989/12/30 = 2.75
-      retailValue: "$170",
+      retailValue: "$275",
       includes: [
-        { type: "Natural", count: 10, value: "$50" },
-        { type: "High-End", count: 8, value: "$80" },
-        { type: "Magazine", count: 2, value: "$40" },
+        { type: "Natural", count: 15, value: "$75" },
+        { type: "High-End", count: 10, value: "$100" },
+        { type: "Magazine", count: 5, value: "$100" },
       ],
       getIncludes: (billingCycle) => [
-        { 
-          type: "Natural", 
-          count: billingCycle === 'annual' ? 120 : 10, 
-          value: billingCycle === 'annual' ? "$600" : "$50" 
+        {
+          type: "Natural",
+          count: billingCycle === 'annual' ? 180 : 15,
+          value: billingCycle === 'annual' ? "$900" : "$75"
         },
-        { 
-          type: "High-End", 
-          count: billingCycle === 'annual' ? 96 : 8, 
-          value: billingCycle === 'annual' ? "$960" : "$80" 
+        {
+          type: "High-End",
+          count: billingCycle === 'annual' ? 120 : 10,
+          value: billingCycle === 'annual' ? "$1,200" : "$100"
         },
-        { 
-          type: "Magazine", 
-          count: billingCycle === 'annual' ? 24 : 2, 
-          value: billingCycle === 'annual' ? "$480" : "$40" 
+        {
+          type: "Magazine",
+          count: billingCycle === 'annual' ? 60 : 5,
+          value: billingCycle === 'annual' ? "$1,200" : "$100"
         },
       ],
       features: [
@@ -291,16 +316,16 @@ const PricingPage = () => {
     {
       category: "Portrait / Beauty Retouching",
       services: [
-        { name: "Natural Retouch (Basic)", price: 1, desc: "simple clean-up, natural skin", icon: Image },
-        { name: "High-End Retouch (Premium)", price: 3, desc: "detailed skin, tones, pro look", icon: Settings },
-        { name: "Magazine Retouch (Luxury)", price: 20, desc: "editorial-level polish, advanced techniques", icon: Crown }
+        { name: "Natural Retouch (Basic)", price: 5, desc: "simple clean-up, natural skin", icon: Image },
+        { name: "High-End Retouch (Premium)", price: 8, desc: "detailed skin, tones, pro look", icon: Settings },
+        { name: "Magazine Retouch (Luxury)", price: 15, desc: "editorial-level polish, advanced techniques", icon: Crown }
       ]
     },
     {
       category: "E-Commerce / Product Retouching",
       services: [
-        { name: "Basic Product", price: 5, desc: "background removal + color correction", icon: Download },
-        { name: "Premium Product", price: 10, desc: "background removal + shadows/reflections", icon: BarChart3 }
+        { name: "Basic Product", price: 1, desc: "background removal + color correction", icon: Download },
+        { name: "Premium Product", price: 3, desc: "background removal + shadows/reflections", icon: BarChart3 }
       ]
     },
     {

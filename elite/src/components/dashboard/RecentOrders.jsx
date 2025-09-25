@@ -44,7 +44,10 @@ const RecentOrders = ({ recentOrders }) => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-gray-900 text-sm md:text-base truncate">
-                    Order #{order._id.slice(-8)}
+                    {order.orderTitle || `Order #${order._id.slice(-8)}`}
+                  </p>
+                  <p className="text-xs md:text-sm text-gray-500">
+                    {(order.orderType === 'pay-per-image' ? 'Pay-Per-Image' : 'Subscription')}
                   </p>
                   <p className="text-xs md:text-sm text-gray-600">
                     {new Date(order.createdAt).toLocaleDateString(undefined, {
@@ -55,6 +58,11 @@ const RecentOrders = ({ recentOrders }) => {
                 </div>
               </div>
               <div className="flex items-center ml-2 flex-shrink-0">
+                {typeof order.orderAmount === 'number' && (
+                  <span className="mr-3 text-sm font-semibold text-gray-800">
+                    {order.orderCurrency === 'NGN' ? `₦${order.orderAmount.toLocaleString()}` : `$${order.orderAmount}`}
+                  </span>
+                )}
                 <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(order.status)}`}>
                   {order.status}
                 </span>

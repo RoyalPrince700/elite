@@ -47,5 +47,13 @@ export const chatService = {
       method: 'POST'
     });
     return response;
+  },
+
+  // Admin: Create chat for specific user
+  createChatForUser: async (userId) => {
+    const response = await apiService.request(`/chat/admin/chat/user/${userId}`, {
+      method: 'POST'
+    });
+    return response;
   }
 };

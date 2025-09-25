@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { chatService } from '../../services/chatService';
-import { MessageCircle, Users, Clock } from 'lucide-react';
+import { apiService } from '../../services/api';
+import { MessageCircle, Users, Clock, Search } from 'lucide-react';
 
 const ChatTab = () => {
   const [chats, setChats] = useState([]);
+  const [users, setUsers] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [newMessage, setNewMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const { socket } = useSocket();
 
   useEffect(() => {
-    loadChats();
+    loadChatsAndUsers();
   }, []);
 
   useEffect(() => {
@@ -21,7 +24,7 @@ const ChatTab = () => {
       // Listen for new chat messages
       socket.on('new_chat_message', (data) => {
         // Update the chat list
-        loadChats();
+        loadChatsAndUsers();
         // If this is the currently selected chat, add the message
         if (selectedChat && selectedChat._id === data.chatId) {
           setMessages(prev => [...prev, data.message]);
@@ -42,49 +45,113 @@ const ChatTab = () => {
     }
   }, [socket, selectedChat]);
 
-  const loadChats = async () => {
+  const loadChatsAndUsers = async () => {
     try {
       setIsLoading(true);
-      const response = await chatService.getAllChats();
-      if (response.success) {
-        setChats(response.chats);
+
+      // Load chats
+      const chatsResponse = await chatService.getAllChats();
+      if (chatsResponse.success) {
+        setChats(chatsResponse.chats);
+      }
+
+      // Load users
+      const usersResponse = await apiService.getAllUsers();
+      if (usersResponse.success) {
+        setUsers(usersResponse.data.users);
       }
     } catch (error) {
-      console.error('❌ [AdminChat] Error loading chats:', error);
+      console.error('❌ [AdminChat] Error loading chats and users:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSelectChat = async (chat) => {
-    setSelectedChat(chat);
-
-    try {
-      // Join the chat room
-      if (socket) {
-        socket.emit('join_chat', chat._id);
+  // Combine chats and users, filter by search term
+  const getFilteredChatUsers = () => {
+    // Create a map of existing chat users for quick lookup
+    const chatUserMap = new Map();
+    chats.forEach(chat => {
+      if (chat.user?._id) {
+        chatUserMap.set(chat.user._id, { ...chat, hasMessaged: true });
       }
+    });
 
-      // Load messages for this chat
-      const response = await chatService.getAdminChatMessages(chat._id);
-      if (response.success) {
-        setMessages(response.messages);
-      }
+    // Combine users with chat info
+    const combinedList = users.map(user => {
+      const existingChat = chatUserMap.get(user._id);
+      return existingChat ? existingChat : { user, hasMessaged: false };
+    });
 
-      // Assign admin to chat if not already assigned
-      if (!chat.admin) {
-        await chatService.assignAdminToChat(chat._id);
-        loadChats(); // Refresh chat list
-      }
+    // Filter by search term
+    if (!searchTerm.trim()) {
+      return combinedList;
+    }
 
-      // Mark messages as read
-      await chatService.markAdminMessagesAsRead(chat._id);
-      // Notify server to broadcast updated unread counts
-      if (socket) {
-        socket.emit('mark_read', { chatId: chat._id });
+    const searchLower = searchTerm.toLowerCase();
+    return combinedList.filter(item => {
+      const user = item.user;
+      return (
+        user.fullName?.toLowerCase().includes(searchLower) ||
+        user.email?.toLowerCase().includes(searchLower) ||
+        user.companyName?.toLowerCase().includes(searchLower)
+      );
+    });
+  };
+
+  const handleSelectChat = async (item) => {
+    const isExistingChat = item.hasMessaged;
+
+    if (isExistingChat) {
+      // Handle existing chat
+      setSelectedChat(item);
+
+      try {
+        // Join the chat room
+        if (socket) {
+          socket.emit('join_chat', item._id);
+        }
+
+        // Load messages for this chat
+        const response = await chatService.getAdminChatMessages(item._id);
+        if (response.success) {
+          setMessages(response.messages);
+        }
+
+        // Assign admin to chat if not already assigned
+        if (!item.admin) {
+          await chatService.assignAdminToChat(item._id);
+          loadChatsAndUsers(); // Refresh chat list
+        }
+
+        // Mark messages as read
+        await chatService.markAdminMessagesAsRead(item._id);
+        // Notify server to broadcast updated unread counts
+        if (socket) {
+          socket.emit('mark_read', { chatId: item._id });
+        }
+      } catch (error) {
+        console.error('❌ [AdminChat] Error selecting chat:', error);
       }
-    } catch (error) {
-      console.error('❌ [AdminChat] Error selecting chat:', error);
+    } else {
+      // Handle new chat with user - create chat for this user
+      try {
+        const response = await chatService.createChatForUser(item.user._id);
+        if (response.success) {
+          setSelectedChat(response.chat);
+          setMessages([]); // No messages yet for new chat
+
+          // Join the chat room
+          if (socket) {
+            socket.emit('join_chat', response.chat._id);
+          }
+
+          // Refresh the chat list to include the new chat
+          loadChatsAndUsers();
+        }
+      } catch (error) {
+        console.error('❌ [AdminChat] Error creating chat for user:', error);
+      }
     }
   };
 
@@ -147,60 +214,85 @@ const ChatTab = () => {
       {/* Chat List */}
       <div className="w-1/3 border-r border-gray-200 flex flex-col min-h-0">
         <div className="p-4 border-b border-gray-200 flex-shrink-0">
-          <h3 className="text-lg font-semibold text-gray-900">Chats</h3>
-          <p className="text-sm text-gray-500">{chats.length} active conversations</p>
+          <h3 className="text-lg font-semibold text-gray-900">Messages</h3>
+          <p className="text-sm text-gray-500">{users.length} users available</p>
+
+          {/* Search Input */}
+          <div className="mt-3 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {chats.length === 0 ? (
+          {getFilteredChatUsers().length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               <MessageCircle className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-              <p>No active chats</p>
+              <p>{searchTerm ? 'No users found' : 'No users available'}</p>
             </div>
           ) : (
             <div className="space-y-1">
-              {chats.map((chat) => (
-                <div
-                  key={chat._id}
-                  onClick={() => handleSelectChat(chat)}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 ${
-                    selectedChat?._id === chat._id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-medium">
-                          {chat.user?.fullName?.charAt(0) || 'U'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {chat.user?.fullName || 'Unknown User'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatTime(chat.lastMessageTime)}
-                        </p>
-                      </div>
-                      <p className="text-sm text-gray-500 truncate">
-                        {chat.lastMessage || 'No messages yet'}
-                      </p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <span className="text-xs text-gray-400">
-                          {chat.user?.email}
-                        </span>
-                        {chat.unreadCount?.admin > 0 && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            {chat.unreadCount.admin}
+              {getFilteredChatUsers().map((item) => {
+                const user = item.user;
+                const isChat = item.hasMessaged;
+                const chatId = isChat ? item._id : `user-${user._id}`;
+
+                return (
+                  <div
+                    key={chatId}
+                    onClick={() => handleSelectChat(item)}
+                    className={`p-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 ${
+                      selectedChat?._id === item._id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    }`}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-blue-600 font-medium">
+                            {user?.fullName?.charAt(0) || 'U'}
                           </span>
-                        )}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {user?.fullName || 'Unknown User'}
+                          </p>
+                          {isChat && (
+                            <p className="text-xs text-gray-500">
+                              {formatTime(item.lastMessageTime)}
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 truncate">
+                          {isChat ? (item.lastMessage || 'No messages yet') : 'Start new conversation'}
+                        </p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <span className="text-xs text-gray-400">
+                            {user?.email}
+                          </span>
+                          {isChat && item.unreadCount?.admin > 0 && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              {item.unreadCount.admin}
+                            </span>
+                          )}
+                          {!isChat && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                              New
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

@@ -108,6 +108,99 @@ export const emailTemplates = {
   },
 
   /**
+   * Pay-per-image activated email template
+   * @param {Object} data
+   * @param {string} data.fullName
+   * @param {string} data.serviceName
+   * @param {number} data.quantity
+   * @param {string} data.currency
+   * @param {number} data.unitPrice
+   * @param {number} data.totalPrice
+   * @param {Date|string} [data.activatedAt]
+   * @returns {Object}
+   */
+  payPerImageActivated: (data = {}) => {
+    const {
+      fullName = 'Customer',
+      serviceName = 'Pay-per-Image Service',
+      quantity = 1,
+      currency = 'USD',
+      unitPrice,
+      totalPrice,
+      activatedAt
+    } = data || {};
+
+    const firstName = (fullName || '').split(' ')[0] || 'there';
+    const currencySymbol = currency === 'NGN' ? '₦' : '$';
+    const unitStr = typeof unitPrice === 'number' ? unitPrice.toLocaleString() : unitPrice;
+    const totalStr = typeof totalPrice === 'number' ? totalPrice.toLocaleString() : totalPrice;
+    const dateStr = activatedAt ? new Date(activatedAt).toLocaleDateString() : new Date().toLocaleDateString();
+
+    const subject = `Your ${serviceName} is Active – ${quantity} images`;
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pay-per-Image Activated - Elite Retoucher</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a; }
+          .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+          .header { background: #0ea5e9; color: white; padding: 28px; text-align: center; border-radius: 12px 12px 0 0; }
+          .content { background: #f8fafc; padding: 24px; border-radius: 0 0 12px 12px; }
+          .section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 14px 0; }
+          .row { display: flex; justify-content: space-between; margin: 8px 0; }
+          .label { color: #64748b; }
+          .value { color: #0f172a; font-weight: 600; }
+          .button { display: inline-block; background: #0ea5e9; color: #ffffff !important; padding: 12px 20px; text-decoration: none; border-radius: 8px; margin-top: 14px; font-weight: 600; }
+          .footer { text-align: center; margin-top: 16px; color: #64748b; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>You're all set, ${firstName}! ✅</h1>
+            <p>Your pay-per-image order is now active</p>
+          </div>
+          <div class="content">
+            <p>Thanks for your purchase. You can now submit up to <strong>${quantity}</strong> images for <strong>${serviceName}</strong>.</p>
+            <div class="section">
+              <div class="row"><span class="label">Service</span><span class="value">${serviceName}</span></div>
+              <div class="row"><span class="label">Images</span><span class="value">${quantity}</span></div>
+              ${unitStr ? `<div class="row"><span class="label">Unit price</span><span class="value">${currencySymbol}${unitStr} ${currency}</span></div>` : ''}
+              ${totalStr ? `<div class="row"><span class="label">Total paid</span><span class="value">${currencySymbol}${totalStr} ${currency}</span></div>` : ''}
+              <div class="row"><span class="label">Activated</span><span class="value">${dateStr}</span></div>
+              <div class="row"><span class="label">Status</span><span class="value">Active</span></div>
+            </div>
+            <p>Head to your dashboard to upload photos and track progress.</p>
+            <a href="https://www.eliteretoucher.com/dashboard" class="button">Open Dashboard</a>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const text = [
+      `You're all set, ${firstName}!`,
+      `Your pay-per-image order is now active.`,
+      `Service: ${serviceName}`,
+      `Images: ${quantity}`,
+      unitStr ? `Unit price: ${currencySymbol}${unitStr} ${currency}` : '',
+      totalStr ? `Total paid: ${currencySymbol}${totalStr} ${currency}` : '',
+      `Activated: ${dateStr}`,
+      'Status: Active',
+      '',
+      'Open Dashboard: https://www.eliteretoucher.com/dashboard'
+    ].filter(Boolean).join('\n');
+
+    return { subject, html, text };
+  },
+
+  /**
    * Subscription activated email template
    * @param {Object} data
    * @param {string} data.fullName

@@ -125,6 +125,16 @@ export const sendSubscriptionRequestReceiptEmail = async (userEmail, data) => {
 };
 
 /**
+ * Send pay-per-image activation email to user
+ * @param {string} userEmail - User's email address
+ * @param {Object} data - Activation data
+ */
+export const sendPayPerImageActivatedEmail = async (userEmail, data = {}) => {
+  const { subject, html, text } = emailTemplates.payPerImageActivated(data);
+  return await sendEmail(userEmail, subject, html, text);
+};
+
+/**
  * Send chat notification to admin when user sends a message
  * @param {string} adminEmail
  * @param {Object} data - { userFullName, userEmail, messageText, chatId, dashboardUrl, sentAt }

@@ -6,7 +6,8 @@ import {
   getAllChats,
   assignAdminToChat,
   getAdminChatMessages,
-  markMessagesAsRead
+  markMessagesAsRead,
+  createChatForUser
 } from '../controllers/chatController.js';
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.get('/admin/chats', requireAdmin, getAllChats);
 router.post('/admin/chat/:chatId/assign', requireAdmin, assignAdminToChat);
 router.get('/admin/chat/:chatId/messages', requireAdmin, getAdminChatMessages);
 router.post('/admin/chat/:chatId/read', requireAdmin, markMessagesAsRead);
+router.post('/admin/chat/user/:userId', requireAdmin, createChatForUser);
 
 export default router;

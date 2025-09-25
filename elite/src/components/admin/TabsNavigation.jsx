@@ -88,7 +88,7 @@ const TabsNavigation = ({
             }`}
           >
             <FaImage className="inline mr-1" />
-            Pay-Per-Image Requests
+            PPI Requests
             {/* Show notification badge for pending requests */}
             {(() => {
               const pendingRequests = payPerImageRequests?.filter(request => request.status === 'pending').length || 0;
@@ -113,7 +113,7 @@ const TabsNavigation = ({
             }`}
           >
             <FaImage className="inline mr-1" />
-            Pay-Per-Image Subscriptions
+            PPI Subscriptions
           </button>
           <button
             onClick={() => {

@@ -79,20 +79,46 @@ const Dashboard = () => {
 
       // Fetch user's subscription requests
       const requestsResponse = await apiService.getUserSubscriptionRequests();
-      if (requestsResponse.success) {
-        const requests = requestsResponse.data.requests || [];
-        const pendingRequests = requests.filter(req => req.status === 'pending');
-        const approvedRequests = requests.filter(req => req.status === 'approved');
+      const subscriptionRequests = requestsResponse.success ? (requestsResponse.data.requests || []) : [];
 
-        setStats(prev => ({
-          ...prev,
-          pendingOrders: pendingRequests.length,
-          completedOrders: approvedRequests.length
-        }));
+      const payPerImageResponse = await apiService.getUserPayPerImageRequests().catch(error => {
+        console.error('Failed to fetch pay-per-image requests:', error);
+        return { success: false };
+      });
+      const payPerImageRequests = payPerImageResponse.success ? (payPerImageResponse.data.requests || []) : [];
 
-        // Set recent orders (last 3)
-        setRecentOrders(requests.slice(0, 3));
-      }
+      const normalizedSubscriptionRequests = subscriptionRequests.map(request => ({
+        ...request,
+        orderType: 'subscription',
+        orderTitle: request.planId?.name || 'Subscription Plan',
+        orderAmount: request.finalPrice,
+        orderCurrency: request.currency || 'USD'
+      }));
+
+      const normalizedPayPerImageRequests = payPerImageRequests.map(request => ({
+        ...request,
+        orderType: 'pay-per-image',
+        orderTitle: request.serviceName || 'Pay-Per-Image Order',
+        orderAmount: request.totalPrice,
+        orderCurrency: request.currency || 'USD'
+      }));
+
+      const allRequests = [...normalizedSubscriptionRequests, ...normalizedPayPerImageRequests];
+
+      const pendingOrders = allRequests.filter(req => req.status === 'pending');
+      const completedOrders = allRequests.filter(req => ['approved', 'completed', 'invoice_sent'].includes(req.status));
+
+      setStats(prev => ({
+        ...prev,
+        pendingOrders: pendingOrders.length,
+        completedOrders: completedOrders.length
+      }));
+
+      const sortedRecentOrders = allRequests
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 3);
+
+      setRecentOrders(sortedRecentOrders);
 
       // Fetch user's invoices
       const invoicesResponse = await apiService.getUserInvoices();
