@@ -13,10 +13,10 @@ jobs:
     steps:
     - name: Ping Backend
       run: |
-        echo "Pinging backend at https://elite-pnpr.onrender.com"
+        echo "Pinging backend at https://elite-xiov.onrender.com"
 
         # Try to ping the main endpoint
-        if curl -f -s --max-time 30 "https://elite-pnpr.onrender.com" > /dev/null; then
+        if curl -f -s --max-time 30 "https://elite-xiov.onrender.com" > /dev/null; then
           echo "✅ Successfully pinged main endpoint"
         else
           echo "❌ Failed to ping main endpoint, trying alternative endpoints..."
@@ -32,7 +32,7 @@ jobs:
 
           success=false
           for endpoint in "${endpoints[@]}"; do
-            if curl -f -s --max-time 30 "https://elite-pnpr.onrender.com$endpoint" > /dev/null; then
+            if curl -f -s --max-time 30 "https://elite-xiov.onrender.com$endpoint" > /dev/null; then
               echo "✅ Successfully pinged $endpoint"
               success=true
               break
