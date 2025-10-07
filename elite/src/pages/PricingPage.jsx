@@ -114,11 +114,11 @@ const PricingPage = () => {
 
   // Fixed NGN pricing for pay-per-image services
   const NGN_PAY_PER_IMAGE_OVERRIDES = {
-    "Natural Retouch (Basic)": 600,
-    "High-End Retouch (Premium)": 1500,
+    "Natural Retouch (Basic)": 3000,
+    "High-End Retouch (Premium)": 5000,
     "Magazine Retouch (Luxury)": 7000,
-    "Basic Product": 3000,
-    "Premium Product": 5000,
+    "Basic Product": 600,
+    "Premium Product": 1500,
     "Advanced composites & manipulations": "Custom Quote"
   };
 
