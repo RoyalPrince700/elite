@@ -65,6 +65,7 @@ export const NavBar = () => {
                 <Link to="/services" className="hover:text-blue-700 transition-colors font-medium">Services</Link>
                 <Link to="/portfolio" className="hover:text-blue-700 transition-colors font-medium">Portfolio</Link>
                 <Link to="/pricing" className="hover:text-blue-700 transition-colors font-medium">Pricing</Link>
+                <Link to="/blog" className="hover:text-blue-700 transition-colors font-medium">Blog</Link>
                 <Link to="/about" className="hover:text-blue-700 transition-colors font-medium">About</Link>
                 <Link to="/contact" className="hover:text-blue-700 transition-colors font-medium">Contact</Link>
                 {user?.role === 'admin' && (
@@ -134,6 +135,7 @@ export const NavBar = () => {
           <Link to="/services" onClick={closeMenu} className="hover:text-blue-200 transition-colors py-2 font-medium">Services</Link>
           <Link to="/portfolio" onClick={closeMenu} className="hover:text-blue-200 transition-colors py-2 font-medium">Portfolio</Link>
           <Link to="/pricing" onClick={closeMenu} className="hover:text-blue-200 transition-colors py-2 font-medium">Pricing</Link>
+          <Link to="/blog" onClick={closeMenu} className="hover:text-blue-200 transition-colors py-2 font-medium">Blog</Link>
           <Link to="/about" onClick={closeMenu} className="hover:text-blue-200 transition-colors py-2 font-medium">About</Link>
           <Link to="/contact" onClick={closeMenu} className="hover:text-blue-200 transition-colors py-2 font-medium">Contact</Link>
           {user?.role === 'admin' && (

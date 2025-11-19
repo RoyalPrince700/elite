@@ -7,6 +7,7 @@ import Subscription from '../models/Subscription.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
 import Photo from '../models/Photo.js';
+import Deliverable from '../models/Deliverable.js';
 
 // Get admin dashboard statistics
 export const getAdminDashboardStats = async (req, res) => {
@@ -499,10 +500,8 @@ export const processPaymentReceipt = async (req, res) => {
 
           await subscription.save();
           receipt.subscriptionId = subscription._id;
-          console.log('Subscription created successfully from receipt:', subscription._id);
         } else {
           receipt.subscriptionId = existingSubscription._id;
-          console.log('Subscription already exists for this user and plan, using existing:', existingSubscription._id);
         }
 
         // Update invoice status to paid
@@ -542,7 +541,7 @@ export const processPaymentReceipt = async (req, res) => {
 // Get all users for admin
 export const getAllUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, role } = req.query;
+    const { page = 1, limit, search, role } = req.query;
 
     const query = {};
     if (role) query.role = role;
@@ -554,12 +553,18 @@ export const getAllUsers = async (req, res) => {
       ];
     }
 
-    const users = await User.find(query)
+    let usersQuery = User.find(query)
       .select('-password')
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .sort({ createdAt: -1 });
 
+    // Only apply pagination if limit is specified
+    if (limit) {
+      usersQuery = usersQuery
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+    }
+
+    const users = await usersQuery;
     const total = await User.countDocuments(query);
 
     res.json({
@@ -568,9 +573,9 @@ export const getAllUsers = async (req, res) => {
         users,
         pagination: {
           page: parseInt(page),
-          limit: parseInt(limit),
+          limit: limit ? parseInt(limit) : null,
           total,
-          pages: Math.ceil(total / limit)
+          pages: limit ? Math.ceil(total / limit) : 1
         }
       }
     });
@@ -984,7 +989,6 @@ export const updatePhotoStatus = async (req, res) => {
     await photo.save();
 
     // Email notifications removed
-    console.log('DEBUG: Email notifications disabled');
 
     res.json({
       success: true,
@@ -1034,6 +1038,159 @@ export const getPhotoStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch photo statistics'
+    });
+  }
+};
+
+// @desc    Get all deliverables for admin
+// @route   GET /api/admin/deliverables
+// @access  Private/Admin
+export const getAllDeliverables = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search, userId } = req.query;
+
+    const query = {};
+    if (userId) query.userId = userId;
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    let deliverablesQuery = Deliverable.find(query)
+      .populate('userId', 'fullName email companyName')
+      .populate('createdBy', 'fullName email')
+      .sort({ createdAt: -1 });
+
+    // Only apply pagination if limit is specified
+    if (limit) {
+      deliverablesQuery = deliverablesQuery
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+    }
+
+    const deliverables = await deliverablesQuery;
+    const total = await Deliverable.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        deliverables,
+        total,
+        page: parseInt(page),
+        pages: limit ? Math.ceil(total / limit) : 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching deliverables:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch deliverables'
+    });
+  }
+};
+
+// @desc    Create a new deliverable
+// @route   POST /api/admin/deliverables
+// @access  Private/Admin
+export const createDeliverable = async (req, res) => {
+  try {
+    const { userId, title, link, description } = req.body;
+
+    if (!userId || !title || !link || !description) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields are required: userId, title, link, description'
+      });
+    }
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const deliverable = new Deliverable({
+      userId,
+      title: title.trim(),
+      link: link.trim(),
+      description: description.trim(),
+      createdBy: req.user.id
+    });
+
+    await deliverable.save();
+
+    // Populate the deliverable with user and creator info
+    await deliverable.populate('userId', 'fullName email companyName');
+    await deliverable.populate('createdBy', 'fullName email');
+
+    res.status(201).json({
+      success: true,
+      data: deliverable,
+      message: 'Deliverable created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating deliverable:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create deliverable'
+    });
+  }
+};
+
+// @desc    Delete a deliverable
+// @route   DELETE /api/admin/deliverables/:id
+// @access  Private/Admin
+export const deleteDeliverable = async (req, res) => {
+  try {
+    const deliverable = await Deliverable.findById(req.params.id);
+
+    if (!deliverable) {
+      return res.status(404).json({
+        success: false,
+        message: 'Deliverable not found'
+      });
+    }
+
+    await Deliverable.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: 'Deliverable deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting deliverable:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete deliverable'
+    });
+  }
+};
+
+// @desc    Get user deliverables (for user dashboard)
+// @route   GET /api/deliverables
+// @access  Private
+export const getUserDeliverables = async (req, res) => {
+  try {
+    const deliverables = await Deliverable.find({ userId: req.user.id })
+      .populate('createdBy', 'fullName email')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: {
+        deliverables
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user deliverables:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch deliverables'
     });
   }
 };

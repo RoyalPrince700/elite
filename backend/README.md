@@ -6,12 +6,16 @@ A Node.js/Express backend API for the EliteRetoucher photo retouching service, b
 
 - **User Authentication**: JWT-based authentication with secure password hashing
 - **Photo Upload**: Cloudinary integration for image storage and optimization
+- **Blog System**: Complete blogging platform with rich text editing, comments, and likes
 - **Subscription Management**: Handle different pricing tiers and usage tracking
 - **Order Processing**: Complete order lifecycle management with manual payment tracking
 - **File Management**: Upload, process, and manage photo files
 - **Manual Billing**: Complete subscription request, invoice, and payment workflow
-- **Admin Dashboard**: Manage subscription requests, create invoices, process payments
+- **Admin Dashboard**: Manage subscription requests, create invoices, process payments, and blog content
 - **Payment Tracking**: Upload receipts, track payment status, manage subscriptions
+- **Content Management**: Rich text blog posts with image uploads, SEO optimization, and analytics
+- **Community Features**: Blog comments and likes system with nested replies
+- **Performance**: Database indexing, caching, and image optimization
 - **Security**: Rate limiting, CORS, helmet security headers
 - **Error Handling**: Comprehensive error handling and logging
 
@@ -34,12 +38,20 @@ backend/
 │   └── database.js        # MongoDB connection
 ├── controllers/
 │   ├── authController.js  # Authentication logic
+│   ├── blogController.js  # Blog management logic
+│   ├── commentController.js # Comment management logic
+│   ├── likeController.js  # Like management logic
 │   └── photoController.js # Photo management logic
 ├── middleware/
 │   ├── auth.js           # JWT authentication middleware
+│   ├── validators/
+│   │   └── blogValidators.js # Blog validation middleware
 │   └── errorHandler.js   # Error handling middleware
 ├── models/
 │   ├── User.js           # User model
+│   ├── Blog.js           # Blog post model
+│   ├── Comment.js        # Comment model
+│   ├── Like.js           # Like model
 │   ├── Subscription.js   # Subscription model
 │   ├── Order.js          # Order model
 │   ├── Photo.js          # Photo model
@@ -47,7 +59,10 @@ backend/
 │   └── RetouchingStyle.js
 ├── routes/
 │   ├── auth.js           # Authentication routes
+│   ├── blog.js           # Blog routes
 │   └── photos.js         # Photo routes
+├── services/
+│   └── cacheService.js   # Caching service for performance
 ├── utils/
 │   └── seeder.js         # Database seeder
 ├── uploads/              # Temporary upload directory
@@ -151,6 +166,33 @@ MAILTRAP_ENDPOINT=https://send.api.mailtrap.io
 - `POST /api/subscriptions/admin/invoices` - Create invoice
 - `PUT /api/subscriptions/admin/payments/receipts/:id` - Process payment receipt
 
+### Blog System
+#### Public Blog Routes
+- `GET /api/blogs` - Get published blog posts (with pagination, search, tags)
+- `GET /api/blogs/:slug` - Get single blog post by slug
+
+#### Blog Comments (Public)
+- `GET /api/blogs/:blogId/comments` - Get comments for a blog post
+- `POST /api/blogs/:blogId/comments` - Create comment (authenticated)
+- `PUT /api/blogs/comments/:commentId` - Update comment (author only)
+- `DELETE /api/blogs/comments/:commentId` - Delete comment (author only)
+
+#### Blog Likes (Authenticated)
+- `POST /api/blogs/:blogId/likes` - Like/unlike a blog post
+- `GET /api/blogs/:blogId/likes/status` - Check like status
+- `POST /api/blogs/comments/:commentId/likes` - Like/unlike a comment
+- `DELETE /api/blogs/comments/:commentId/likes` - Remove like from comment
+- `GET /api/blogs/comments/:commentId/likes/status` - Check comment like status
+
+#### Admin Blog Management
+- `GET /api/blogs/admin/all` - Get all blog posts (published and drafts)
+- `GET /api/blogs/admin/stats` - Get blog statistics and analytics
+- `POST /api/blogs` - Create new blog post (multipart/form-data for images)
+- `PUT /api/blogs/:id` - Update blog post
+- `DELETE /api/blogs/:id` - Delete blog post
+- `PUT /api/blogs/:id/publish` - Publish a draft blog post
+- `PUT /api/blogs/:id/unpublish` - Unpublish a published blog post
+
 ### Health Check
 - `GET /health` - Server health check
 
@@ -191,6 +233,25 @@ MAILTRAP_ENDPOINT=https://send.api.mailtrap.io
 - Receipt document uploads
 - Admin approval and subscription activation
 
+### Blog
+- Rich text content with HTML support
+- SEO optimization (meta description, slug)
+- Author relationship and publishing status
+- Tag system for categorization
+- Header image integration with Cloudinary
+
+### Comment
+- Nested comment system with parent-child relationships
+- Author attribution and content moderation
+- Blog post associations
+- Like counting and user engagement tracking
+
+### Like
+- Flexible like system for blogs and comments
+- User engagement tracking
+- Duplicate prevention with compound indexes
+- Target type polymorphism (Blog/Comment)
+
 ## 🔒 Security Features
 
 - **JWT Authentication**: Secure token-based authentication
@@ -226,23 +287,38 @@ The system tracks:
 4. **Processing**: Photos marked as processing, completed, or failed
 5. **Delivery**: Processed photos delivered to users
 
+### Blog System:
+1. **Content Creation**: Admin creates rich text blog posts with images and SEO optimization
+2. **Publishing Workflow**: Draft → Review → Publish with scheduled publishing support
+3. **Community Engagement**: Users can comment on posts and like content
+4. **SEO Optimization**: Meta descriptions, slugs, and structured content for search engines
+5. **Performance**: Database indexing, caching, and image optimization for fast loading
+6. **Analytics**: Blog statistics tracking for engagement and content performance
+
 ## 🧪 Testing
 
 ```bash
-# Run tests
+# Run unit tests
 npm test
 
-# Run tests in watch mode
-npm run test:watch
+# Run end-to-end blog workflow tests
+npm run test:e2e
+
+# Seed database with sample data (including blog posts)
+npm run seed
+
+# Clear seeded data
+npm run seed:destroy
 ```
 
 ## 📝 Scripts
 
 - `npm start` - Start production server
 - `npm run dev` - Start development server with nodemon
-- `npm run seed` - Seed database with initial data
+- `npm run seed` - Seed database with initial data (including sample blog posts)
 - `npm run seed:destroy` - Clear all seeded data
-- `npm test` - Run test suite
+- `npm test` - Run unit test suite
+- `npm run test:e2e` - Run end-to-end blog workflow tests
 
 ## 🚀 Deployment
 

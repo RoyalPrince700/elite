@@ -67,7 +67,7 @@ const ChatTab = () => {
     }
   };
 
-  // Combine chats and users, filter by search term
+  // Combine chats and users, filter by search term, and sort so active/unread chats appear first
   const getFilteredChatUsers = () => {
     // Create a map of existing chat users for quick lookup
     const chatUserMap = new Map();
@@ -83,19 +83,42 @@ const ChatTab = () => {
       return existingChat ? existingChat : { user, hasMessaged: false };
     });
 
+    let list = combinedList;
+
     // Filter by search term
-    if (!searchTerm.trim()) {
-      return combinedList;
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      list = list.filter(item => {
+        const user = item.user;
+        return (
+          user.fullName?.toLowerCase().includes(searchLower) ||
+          user.email?.toLowerCase().includes(searchLower) ||
+          user.companyName?.toLowerCase().includes(searchLower)
+        );
+      });
     }
 
-    const searchLower = searchTerm.toLowerCase();
-    return combinedList.filter(item => {
-      const user = item.user;
-      return (
-        user.fullName?.toLowerCase().includes(searchLower) ||
-        user.email?.toLowerCase().includes(searchLower) ||
-        user.companyName?.toLowerCase().includes(searchLower)
-      );
+    // Sort so:
+    // 1) Chats with unread admin messages come first
+    // 2) Then chats that have messaged before
+    // 3) Then users with no messages yet
+    // Within each group, sort by most recent lastMessageTime
+    return [...list].sort((a, b) => {
+      const aUnread = a.unreadCount?.admin || 0;
+      const bUnread = b.unreadCount?.admin || 0;
+      if (aUnread !== bUnread) {
+        return bUnread - aUnread; // more unread messages first
+      }
+
+      const aHasMessaged = a.hasMessaged ? 1 : 0;
+      const bHasMessaged = b.hasMessaged ? 1 : 0;
+      if (aHasMessaged !== bHasMessaged) {
+        return bHasMessaged - aHasMessaged; // existing chats before "New" users
+      }
+
+      const aTime = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0;
+      const bTime = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0;
+      return bTime - aTime; // most recent first
     });
   };
 
@@ -210,11 +233,11 @@ const ChatTab = () => {
   }
 
   return (
-    <div className="flex h-full max-h-screen">
+    <div className="flex h-full">
       {/* Chat List */}
-      <div className="w-1/3 border-r border-gray-200 flex flex-col min-h-0">
+      <div className="w-1/3 lg:w-1/4 xl:w-1/5 max-w-xs border-r border-gray-200 flex flex-col min-h-0">
         <div className="p-4 border-b border-gray-200 flex-shrink-0">
-          <h3 className="text-lg font-semibold text-gray-900">Messages</h3>
+          <h3 className="text-base font-semibold text-gray-900">Messages</h3>
           <p className="text-sm text-gray-500">{users.length} users available</p>
 
           {/* Search Input */}

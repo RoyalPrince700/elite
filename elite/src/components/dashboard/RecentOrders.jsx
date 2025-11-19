@@ -28,7 +28,7 @@ const RecentOrders = ({ recentOrders }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
       <div className="flex items-center justify-between mb-4 md:mb-6">
-        <h2 className="text-lg md:text-xl font-bold text-gray-900">Recent Orders</h2>
+        <h2 className="text-base md:text-lg font-bold text-gray-900">Recent Orders</h2>
         <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
           View All
         </button>

@@ -4,7 +4,7 @@ import TimeTableComp from '../components/TimeTableComp'
 import NavBar from '../components/NavBar'
 import ProductShowcase from '../components/ProductShowCase'
 import LogoTicker from '../components/LogoTicker'
-import Pricing from '../components/Pricing'
+import { OurServicesSection } from '../components/Services'
 import Testimonials from '../components/Testimonials'
 import CallToAction from '../components/CallToAction'
 import CreativeCallToAction from '../components/CreativeCallToAction'
@@ -17,7 +17,7 @@ const Home = () => {
       <Hero/>
       {/* <LogoTicker/> */}
       {/* <ProductShowcase/> */}
-      <Pricing/>
+      <OurServicesSection/>
       <CallToAction/>
 
       <Testimonials/>

@@ -15,12 +15,12 @@ const SubscriptionSelectionModal = ({
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Select Subscription</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Select Subscription</h3>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
             >
-              <FaTimes className="text-xl" />
+              <FaTimes className="text-lg" />
             </button>
           </div>
 
@@ -62,7 +62,7 @@ const SubscriptionSelectionModal = ({
                     </div>
                     <div className="ml-4">
                       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                        <FaUpload className="text-blue-600 text-xl" />
+                        <FaUpload className="text-blue-600 text-lg" />
                       </div>
                     </div>
                   </div>

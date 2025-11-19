@@ -49,9 +49,13 @@
         }
     }
 }
+
 body {
-    background: transparent;
-  }
+  background: transparent;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
   .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -74,6 +78,265 @@ body {
     transform: translateZ(0);
     backface-visibility: hidden;
   }
-  
+
+  /* Rich Text Editor Styles */
+  .rich-text-editor {
+    position: relative;
+    background: white;
+  }
+
+  .rich-text-editor .quill {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .rich-text-editor .ql-toolbar {
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 8px 8px 0 0;
+    padding: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .rich-text-editor .ql-container {
+    border: none;
+    font-size: 16px;
+    font-family: inherit;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .rich-text-editor .ql-editor {
+    min-height: 300px;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .rich-text-editor .ql-editor.ql-blank::before {
+    color: #9ca3af;
+    font-style: normal;
+  }
+
+  /* Quill toolbar button styles */
+  .rich-text-editor .ql-toolbar button {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .rich-text-editor .ql-toolbar button:hover {
+    background-color: #e5e7eb;
+  }
+
+  .rich-text-editor .ql-toolbar button.ql-active {
+    background-color: #dbeafe;
+    color: #2563eb;
+  }
+
+  .rich-text-editor .ql-toolbar .ql-stroke {
+    stroke: #374151;
+  }
+
+  .rich-text-editor .ql-toolbar .ql-fill {
+    fill: #374151;
+  }
+
+  .rich-text-editor .ql-toolbar button:hover .ql-stroke {
+    stroke: #111827;
+  }
+
+  .rich-text-editor .ql-toolbar button:hover .ql-fill {
+    fill: #111827;
+  }
+
+  .rich-text-editor .ql-toolbar button.ql-active .ql-stroke {
+    stroke: #2563eb;
+  }
+
+  .rich-text-editor .ql-toolbar button.ql-active .ql-fill {
+    fill: #2563eb;
+  }
+
+  /* Ensure editor content is properly styled */
+  .rich-text-editor .ql-editor p,
+  .rich-text-editor .ql-editor ol,
+  .rich-text-editor .ql-editor ul,
+  .rich-text-editor .ql-editor pre,
+  .rich-text-editor .ql-editor blockquote,
+  .rich-text-editor .ql-editor h1,
+  .rich-text-editor .ql-editor h2,
+  .rich-text-editor .ql-editor h3 {
+    margin-bottom: 16px;
+  }
+
+  .rich-text-editor .ql-editor h1 {
+    font-size: 2em;
+    font-weight: bold;
+  }
+
+  .rich-text-editor .ql-editor h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  .rich-text-editor .ql-editor h3 {
+    font-size: 1.25em;
+    font-weight: bold;
+  }
+
+  .rich-text-editor .ql-editor a {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+
+  .rich-text-editor .ql-editor img {
+    max-width: 100%;
+    height: auto;
+    margin: 16px 0;
+    border-radius: 8px;
+  }
+
+  .rich-text-editor .ql-editor video,
+  .rich-text-editor .ql-editor iframe {
+    max-width: 100%;
+    height: auto;
+    margin: 16px 0;
+    border-radius: 8px;
+  }
+
+  .rich-text-editor .ql-video {
+    width: 100%;
+    height: 400px;
+  }
+
+  .rich-text-editor .ql-editor blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 16px;
+    margin-left: 0;
+    font-style: italic;
+    color: #6b7280;
+  }
+
+  .rich-text-editor .ql-editor code {
+    background-color: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  .rich-text-editor .ql-editor pre {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  /* Ensure the editor is clickable and interactive */
+  .rich-text-editor,
+  .rich-text-editor .quill,
+  .rich-text-editor .ql-container,
+  .rich-text-editor .ql-editor,
+  .rich-text-editor .ql-toolbar,
+  .rich-text-editor .ql-toolbar button {
+    pointer-events: auto !important;
+    cursor: pointer;
+  }
+
+  .rich-text-editor .ql-editor {
+    cursor: text;
+  }
+
+  /* Fix z-index issues with Quill dropdowns */
+  .ql-toolbar .ql-picker-options {
+    z-index: 10001 !important;
+  }
+
+  .ql-tooltip {
+    z-index: 10001 !important;
+  }
+
+/* Blog post content typography (view page) */
+.blog-post-content {
+  color: #111827;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.blog-post-content p {
+  margin-bottom: 1rem;
+}
+
+.blog-post-content h1,
+.blog-post-content h2,
+.blog-post-content h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.blog-post-content h1 {
+  font-size: 1.875rem; /* 30px */
+}
+
+.blog-post-content h2 {
+  font-size: 1.5rem; /* 24px */
+}
+
+.blog-post-content h3 {
+  font-size: 1.25rem; /* 20px */
+}
+
+.blog-post-content ul,
+.blog-post-content ol {
+  margin: 0 0 1.25rem 1.25rem;
+  padding-left: 1rem;
+}
+
+.blog-post-content li {
+  margin-bottom: 0.35rem;
+}
+
+.blog-post-content a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.blog-post-content a:hover {
+  color: #1d4ed8;
+}
+
+.blog-post-content img {
+  max-width: min(100%, 720px);
+  max-height: 480px;
+  width: auto;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1.5rem auto;
+  display: block;
+}
+
+.blog-post-content figure {
+  margin: 1.5rem 0;
+}
+
+.blog-post-content figure img {
+  margin: 0;
+}
+
+.blog-post-content figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+}
 
  

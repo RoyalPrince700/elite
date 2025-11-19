@@ -44,7 +44,7 @@ const SubscriptionBilling = ({
   return (
     <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0">
-        <h2 className="text-xl font-bold text-gray-900 text-center sm:text-left">Subscription & Billing</h2>
+        <h2 className="text-lg font-bold text-gray-900 text-center sm:text-left">Subscription & Billing</h2>
         <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3">
           <a
             href="/subscriptions"
@@ -111,7 +111,7 @@ const SubscriptionBilling = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">Plan Details</h4>
-                    <p className="text-xl font-bold text-blue-600">{subscription.planId?.name || 'N/A'}</p>
+                    <p className="text-lg font-bold text-blue-600">{subscription.planId?.name || 'N/A'}</p>
                     {getPlanBreakdown(subscription.planId?.name) && (
                       <p className="text-sm text-gray-700 mt-1 font-medium">
                         {getPlanBreakdown(subscription.planId?.name)}
@@ -131,7 +131,7 @@ const SubscriptionBilling = ({
                     </h4>
                     {subscription.subscriptionType === 'payPerImage' ? (
                       <>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-base font-semibold text-gray-900">
                           One-time Payment
                         </p>
                         <p className="text-sm text-gray-600">
@@ -144,7 +144,7 @@ const SubscriptionBilling = ({
                       </p>
                     ) : (
                       <>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-base font-semibold text-gray-900">
                           {subscription.nextBillingDate ? new Date(subscription.nextBillingDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
                         </p>
                         {subscription.nextBillingDate && subscription.status === 'active' && (

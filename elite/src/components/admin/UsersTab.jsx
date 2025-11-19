@@ -12,7 +12,7 @@ const UsersTab = ({ filteredUsers, handleUserRoleChange }) => {
                 <div className="flex items-center space-x-3 mb-2">
                   <FaUser className="text-gray-600" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-base font-semibold text-gray-900">
                       {user.fullName || 'No name'}
                     </h3>
                     <p className="text-sm text-gray-600">{user.email}</p>

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, useLocation} from 'react-router-dom'
 import Home from './pages/Home';
 import NavBar from './components/NavBar';
 import Auth from './pages/Auth';
@@ -17,9 +17,30 @@ import AdminDashboard from './pages/AdminDashboard';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import TermsAndPrivacy from './pages/TermsAndPrivacy';
+import BlogList from './pages/BlogList';
+import BlogDetail from './pages/BlogDetail';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider, SocketProvider } from './context';
 import { ProtectedRoute, GuestRoute } from './components/auth';
+
+// Component to conditionally render footer (hide on admin and app-like pages)
+const ConditionalFooter = () => {
+  const location = useLocation();
+  const hideFooter =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/subscriptions');
+
+  return !hideFooter ? <Footer /> : null;
+};
+
+// Component to conditionally render navbar (hide on admin pages)
+const ConditionalNavBar = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+
+  return !isAdminPage ? <NavBar /> : null;
+};
 
 const App = () => {
   return (
@@ -29,7 +50,7 @@ const App = () => {
           <ToastContainer/>
           {/* <NavBarNew/> */}
           {/* <SideBar/> */}
-          <NavBar/>
+          <ConditionalNavBar />
           <ScrollToTop />
           <Routes>
 
@@ -40,6 +61,10 @@ const App = () => {
           <Route path='/portfolio' element={<Portfolio/>}/>
           <Route path='/pricing' element={<PricingPage/>}/>
           <Route path='/terms-privacy' element={<TermsAndPrivacy/>}/>
+
+          {/* Blog Routes - Public */}
+          <Route path='/blog' element={<BlogList/>}/>
+          <Route path='/blog/:slug' element={<BlogDetail/>}/>
 
           {/* Protected Routes - Require Authentication */}
           <Route path='/dashboard' element={
@@ -72,7 +97,7 @@ const App = () => {
           <Route path='/auth/callback' element={<AuthCallback/>}/>
 
         </Routes>
-        <Footer />
+        <ConditionalFooter />
 
         </div>
       </SocketProvider>

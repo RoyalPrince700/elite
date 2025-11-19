@@ -9,9 +9,11 @@ import {
   QuickActions,
   SubscriptionBilling,
   InvoiceModal,
-  ReceiptUploadModal
+  ReceiptUploadModal,
+  DashboardSidebar
 } from '../components/dashboard';
 import UserChat from '../components/chat/UserChat';
+import { FaBars } from 'react-icons/fa';
 
 // Toast ID constant for managing single active toast
 const DASHBOARD_TOAST_ID = 'user-dashboard-toast';
@@ -59,6 +61,11 @@ const Dashboard = () => {
     notes: ''
   });
   const subscriptionRefreshed = useRef(false);
+  const [deliverables, setDeliverables] = useState([]);
+
+  // Sidebar state
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -130,6 +137,12 @@ const Dashboard = () => {
       const receiptsResponse = await apiService.getUserPaymentReceipts();
       if (receiptsResponse.success) {
         setPaymentReceipts(receiptsResponse.data.receipts || []);
+      }
+
+      // Fetch user's deliverables
+      const deliverablesResponse = await apiService.getUserDeliverables();
+      if (deliverablesResponse.success) {
+        setDeliverables(deliverablesResponse.data.deliverables || []);
       }
 
     } catch (error) {
@@ -258,6 +271,149 @@ const Dashboard = () => {
     setShowInvoiceModal(true);
   };
 
+  // Sidebar handlers
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+  };
+
+  const handleMobileSidebarToggle = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  // Tab content components
+  const renderOverviewTab = () => (
+    <div className="space-y-8">
+      {/* Quick Actions - Moved to top for better mobile UX */}
+      <div>
+        <QuickActions subscriptions={subscriptions} />
+      </div>
+
+      {/* Stats Cards */}
+      <StatsCards stats={stats} />
+
+      {/* Recent Orders */}
+      <RecentOrders recentOrders={recentOrders} />
+
+      {/* Full Subscription & Billing Section */}
+      <SubscriptionBilling
+        subscriptions={subscriptions}
+        invoices={invoices}
+        paymentReceipts={paymentReceipts}
+        onViewInvoice={handleViewInvoice}
+        onPaymentStatusUpdate={handlePaymentStatusUpdate}
+        onRefreshSubscriptions={handleRefreshSubscriptions}
+      />
+    </div>
+  );
+
+  const renderUploadTab = () => (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Upload Photos</h2>
+        <QuickActions subscriptions={subscriptions} />
+      </div>
+    </div>
+  );
+
+  const renderOrdersTab = () => (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Order History</h2>
+        <RecentOrders recentOrders={recentOrders} />
+      </div>
+
+      {/* Full Subscription & Billing Section */}
+      <SubscriptionBilling
+        subscriptions={subscriptions}
+        invoices={invoices}
+        paymentReceipts={paymentReceipts}
+        onViewInvoice={handleViewInvoice}
+        onPaymentStatusUpdate={handlePaymentStatusUpdate}
+        onRefreshSubscriptions={handleRefreshSubscriptions}
+      />
+    </div>
+  );
+
+  const renderInvoicesTab = () => (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Invoices & Billing</h2>
+        <SubscriptionBilling
+          subscriptions={subscriptions}
+          invoices={invoices}
+          paymentReceipts={paymentReceipts}
+          onViewInvoice={handleViewInvoice}
+          onPaymentStatusUpdate={handlePaymentStatusUpdate}
+          onRefreshSubscriptions={handleRefreshSubscriptions}
+        />
+      </div>
+    </div>
+  );
+
+  const renderDownloadsTab = () => (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Download Center</h2>
+        {deliverables.length > 0 ? (
+          <div className="space-y-4">
+            {deliverables.map((deliverable) => (
+              <div key={deliverable._id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <FaDownload className="text-blue-600" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {deliverable.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Added {new Date(deliverable.createdAt).toLocaleDateString()} by {deliverable.createdBy?.fullName || 'Admin'}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-gray-700 mb-4">
+                      {deliverable.description}
+                    </p>
+                  </div>
+                  <div className="ml-4">
+                    <a
+                      href={deliverable.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center space-x-2"
+                    >
+                      <FaDownload className="text-sm" />
+                      <span>Download</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <FaDownload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-base font-medium text-gray-900 mb-2">No Downloads Available</h3>
+            <p className="text-gray-600 mb-6">
+              Your admin will add downloadable content here when it's ready.
+            </p>
+            <p className="text-sm text-gray-500">
+              Check back later or contact support if you have any questions.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderChatTab = () => (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Support Chat</h2>
+        <UserChat />
+      </div>
+    </div>
+  );
 
 
 
@@ -265,6 +421,27 @@ const Dashboard = () => {
 
 
 
+
+
+  // Render active tab content
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'overview':
+        return renderOverviewTab();
+      case 'upload':
+        return renderUploadTab();
+      case 'orders':
+        return renderOrdersTab();
+      case 'invoices':
+        return renderInvoicesTab();
+      case 'downloads':
+        return renderDownloadsTab();
+      case 'chat':
+        return renderChatTab();
+      default:
+        return renderOverviewTab();
+    }
+  };
 
   if (loading) {
     return (
@@ -275,96 +452,88 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-20">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Desktop Layout */}
-          <div className="hidden md:flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {user?.fullName || 'User'}!
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Track orders and monitor your subscription.
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Link
-                to="/subscriptions"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md transition-colors font-medium shadow-md inline-block"
-              >
-                Manage Subscriptions
-              </Link>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 mt-20 flex">
+      {/* Sidebar */}
+      <DashboardSidebar
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        user={user}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileToggle={handleMobileSidebarToggle}
+      />
 
-          {/* Mobile Layout */}
-          <div className="md:hidden">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Welcome back, {user?.fullName || 'User'}!
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Track orders and monitor your subscription.
-              </p>
-            </div>
-            <div className="mt-4 flex justify-center">
-              <Link
-                to="/subscriptions"
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-md transition-colors font-medium shadow-md inline-block text-sm"
-              >
-                Manage Subscriptions
-              </Link>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b sticky top-0 z-30">
+          <div className="px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                {/* Mobile sidebar toggle */}
+                <button
+                  onClick={handleMobileSidebarToggle}
+                  className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                >
+                  <FaBars className="h-6 w-6" />
+                </button>
+
+                <div>
+                  <h1 className="text-lg md:text-xl font-bold text-gray-900">
+                    {activeTab === 'overview' && `Welcome back, ${user?.fullName || 'User'}!`}
+                    {activeTab === 'upload' && 'Upload Photos'}
+                    {activeTab === 'orders' && 'Order History'}
+                    {activeTab === 'invoices' && 'Invoices & Billing'}
+                    {activeTab === 'downloads' && 'Download Center'}
+                    {activeTab === 'chat' && 'Support Chat'}
+                  </h1>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {activeTab === 'overview' && 'Track orders and monitor your subscription.'}
+                    {activeTab === 'upload' && 'Upload your photos for professional retouching.'}
+                    {activeTab === 'orders' && 'View and manage all your orders.'}
+                    {activeTab === 'invoices' && 'Manage your billing and payments.'}
+                    {activeTab === 'downloads' && 'Download your completed orders.'}
+                    {activeTab === 'chat' && 'Get help from our support team.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Header actions */}
+              <div className="flex items-center space-x-3">
+                {activeTab !== 'subscriptions' && (
+                  <Link
+                    to="/subscriptions"
+                    className="hidden md:inline-flex bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors font-medium shadow-md text-sm"
+                  >
+                    Manage Subscriptions
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Actions - Moved to top for better mobile UX */}
-        <div className="mb-8">
-          <QuickActions subscriptions={subscriptions} />
+        {/* Content */}
+        <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 overflow-auto">
+          {renderActiveTab()}
         </div>
-
-        {/* Stats Cards */}
-        <StatsCards stats={stats} />
-
-        {/* Recent Orders */}
-        <RecentOrders recentOrders={recentOrders} />
-
-        {/* Full Subscription & Billing Section */}
-        <SubscriptionBilling
-          subscriptions={subscriptions}
-          invoices={invoices}
-          paymentReceipts={paymentReceipts}
-          onViewInvoice={handleViewInvoice}
-          onPaymentStatusUpdate={handlePaymentStatusUpdate}
-          onRefreshSubscriptions={handleRefreshSubscriptions}
-        />
-
-        {/* Invoice Modal */}
-        <InvoiceModal
-          showInvoiceModal={showInvoiceModal}
-          selectedInvoice={selectedInvoice}
-          onClose={() => setShowInvoiceModal(false)}
-          onPaymentStatusUpdate={handlePaymentStatusUpdate}
-        />
-
-        {/* Receipt Upload Modal */}
-        <ReceiptUploadModal
-          showReceiptModal={showReceiptModal}
-          onClose={() => setShowReceiptModal(false)}
-          receiptData={receiptData}
-          onInputChange={handleReceiptInputChange}
-          onSubmit={handleSubmitReceipt}
-          submittingReceipt={submittingReceipt}
-        />
-
-        {/* User Chat */}
-        <UserChat />
-
       </div>
+
+      {/* Modals */}
+      <InvoiceModal
+        showInvoiceModal={showInvoiceModal}
+        selectedInvoice={selectedInvoice}
+        onClose={() => setShowInvoiceModal(false)}
+        onPaymentStatusUpdate={handlePaymentStatusUpdate}
+      />
+
+      <ReceiptUploadModal
+        showReceiptModal={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+        receiptData={receiptData}
+        onInputChange={handleReceiptInputChange}
+        onSubmit={handleSubmitReceipt}
+        submittingReceipt={submittingReceipt}
+      />
     </div>
   );
 };

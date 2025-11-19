@@ -18,7 +18,7 @@ const ReceiptUploadModal = ({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Upload Payment Receipt</h2>
+            <h2 className="text-lg font-bold text-gray-900">Upload Payment Receipt</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"

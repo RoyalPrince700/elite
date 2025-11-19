@@ -11,6 +11,7 @@
     "seed": "node utils/seeder.js",
     "seed:destroy": "node utils/seeder.js -d",
     "test": "jest",
+    "test:e2e": "node scripts/test-blog-workflow.js",
     "test:mail": "node scripts/testMailtrap.js"
   },
   "keywords": [
@@ -38,13 +39,17 @@
     "mongoose": "^8.0.3",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "node-fetch": "^3.3.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "socket.io": "^4.8.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.3.0",
     "nodemon": "^3.0.2",
     "supertest": "^6.3.3"
   }

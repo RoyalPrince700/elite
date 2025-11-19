@@ -19,6 +19,8 @@ import subscriptionRoutes from './routes/subscriptions.js';
 import adminRoutes from './routes/admin.js';
 import chatRoutes from './routes/chat.js';
 import payPerImageRoutes from './routes/payPerImage.js';
+import blogRoutes from './routes/blog.js';
+import userRoutes from './routes/user.js';
 
 // Import models
 import Chat from './models/Chat.js';
@@ -85,24 +87,21 @@ import { authenticateToken } from './middleware/auth.js';
 app.post('/api/subscriptions/payments/receipt', authenticateToken, uploadReceipt.single('receipt'), submitPaymentReceipt);
 
 // API routes
-console.log('🔍 [Server] Setting up API routes');
 app.use('/api/auth', authRoutes);
-console.log('🔍 [Server] Auth routes mounted');
 
 app.use('/api/photos', photoRoutes);
-console.log('🔍 [Server] Photos routes mounted');
 
 app.use('/api/subscriptions', subscriptionRoutes);
-console.log('🔍 [Server] Subscription routes mounted at /api/subscriptions');
 
 app.use('/api/admin', adminRoutes);
-console.log('🔍 [Server] Admin routes mounted at /api/admin');
 
 app.use('/api/chat', chatRoutes);
-console.log('🔍 [Server] Chat routes mounted');
 
 app.use('/api/pay-per-image', payPerImageRoutes);
-console.log('🔍 [Server] Pay-per-image routes mounted');
+
+app.use('/api/blogs', blogRoutes);
+
+app.use('/api/user', userRoutes);
 
 // Email routes removed
 
@@ -161,39 +160,29 @@ io.use(async (socket, next) => {
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log(`🔌 [Socket] User connected: ${socket.userId} (${socket.userRole})`);
-  
   // Join user to their personal room
   socket.join(`user_${socket.userId}`);
-  console.log(`🔌 [Socket] User ${socket.userId} joined personal room`);
-  
+
   // If admin, join admin room
   if (socket.userRole === 'admin') {
     socket.join('admin_room');
-    console.log(`🔌 [Socket] Admin ${socket.userId} joined admin room`);
   }
-  
+
   // Handle joining a specific chat
   socket.on('join_chat', (chatId) => {
-    console.log(`🔌 [Socket] User ${socket.userId} joining chat ${chatId}`);
     socket.join(`chat_${chatId}`);
-    console.log(`🔌 [Socket] User ${socket.userId} joined chat ${chatId}`);
   });
-  
+
   // Handle leaving a chat
   socket.on('leave_chat', (chatId) => {
-    console.log(`🔌 [Socket] User ${socket.userId} leaving chat ${chatId}`);
     socket.leave(`chat_${chatId}`);
-    console.log(`🔌 [Socket] User ${socket.userId} left chat ${chatId}`);
   });
-  
+
   // Handle sending messages
   socket.on('send_message', async (data) => {
-    console.log(`📤 [Socket] Received send_message from ${socket.userId}:`, data);
     try {
       const { chatId, message } = data;
-      
-      console.log(`📤 [Socket] Creating message for chat ${chatId}`);
+
       // Create new message
       const newMessage = new Message({
         chat: chatId,

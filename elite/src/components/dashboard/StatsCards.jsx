@@ -4,28 +4,28 @@ import { FaImages, FaClock, FaCheckCircle, FaChartLine } from 'react-icons/fa';
 const StatsCards = ({ stats }) => {
   const statItems = [
     {
-      icon: <FaImages className="text-blue-600 text-xl" />,
+      icon: <FaImages className="text-blue-600 text-lg" />,
       iconBg: "bg-blue-100",
       label: "Total Photos",
       value: stats.totalPhotos,
       id: "totalPhotos"
     },
     {
-      icon: <FaClock className="text-yellow-600 text-xl" />,
+      icon: <FaClock className="text-yellow-600 text-lg" />,
       iconBg: "bg-yellow-100",
       label: "Pending Orders",
       value: stats.pendingOrders,
       id: "pendingOrders"
     },
     {
-      icon: <FaCheckCircle className="text-green-600 text-xl" />,
+      icon: <FaCheckCircle className="text-green-600 text-lg" />,
       iconBg: "bg-green-100",
       label: "Completed Orders",
       value: stats.completedOrders,
       id: "completedOrders"
     },
     {
-      icon: <FaChartLine className="text-purple-600 text-xl" />,
+      icon: <FaChartLine className="text-purple-600 text-lg" />,
       iconBg: "bg-purple-100",
       label: "This Month",
       value: stats.currentMonthUsage,
@@ -46,7 +46,7 @@ const StatsCards = ({ stats }) => {
                 </div>
                 <div className="ml-3">
                   <p className="text-xs font-medium text-gray-600">{item.label}</p>
-                  <p className="text-xl font-bold text-gray-900">{item.value}</p>
+                  <p className="text-lg font-bold text-gray-900">{item.value}</p>
                 </div>
               </div>
             </div>
@@ -64,7 +64,7 @@ const StatsCards = ({ stats }) => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">{item.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{item.value}</p>
+                <p className="text-xl font-bold text-gray-900">{item.value}</p>
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ const PaymentsTab = ({ paymentReceipts, handleProcessReceipt, processingReceipts
                 <div className="flex items-center space-x-3 mb-2">
                   <FaFileInvoiceDollar className="text-blue-600" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-base font-semibold text-gray-900">
                       Receipt #{receipt._id.slice(-6)}
                     </h3>
                     <p className="text-sm text-gray-600">

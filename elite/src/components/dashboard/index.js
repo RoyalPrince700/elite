@@ -5,3 +5,4 @@ export { default as SubscriptionBilling } from './SubscriptionBilling';
 export { default as InvoiceModal } from './InvoiceModal';
 export { default as ReceiptUploadModal } from './ReceiptUploadModal';
 export { default as SubscriptionSelectionModal } from './SubscriptionSelectionModal';
+export { default as DashboardSidebar } from './DashboardSidebar';

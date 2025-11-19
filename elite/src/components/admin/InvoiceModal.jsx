@@ -19,7 +19,7 @@ const InvoiceModal = ({
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Send Invoice</h2>
+              <h2 className="text-xl font-bold text-gray-900">Send Invoice</h2>
               <p className="text-gray-600 mt-1">Enter payment details for {selectedRequest.companyName}</p>
             </div>
             <button
@@ -39,7 +39,7 @@ const InvoiceModal = ({
                 <p className="text-blue-700 text-sm">{selectedRequest.email}</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-blue-900">
+                <p className="text-xl font-bold text-blue-900">
                   {selectedRequest.currency === 'NGN' ? `₦${selectedRequest.finalPrice.toLocaleString()}` : `$${selectedRequest.finalPrice}`}
                 </p>
                 <p className="text-blue-700 text-sm">per {selectedRequest.billingCycle}</p>
@@ -64,7 +64,7 @@ const InvoiceModal = ({
 
             {/* Payment Details */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Payment Details</h3>
+              <h3 className="text-base font-medium text-gray-900 mb-3">Payment Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>

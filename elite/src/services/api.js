@@ -46,7 +46,21 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        const error = new Error(data.message || `HTTP error! status: ${response.status}`);
+        error.status = response.status;
+        error.response = data;
+
+        // Extract validation errors for 422 responses
+        if (response.status === 422 && data.errors) {
+          error.errors = data.errors;
+          console.error('❌ [ApiService] Validation errors:', data.errors);
+          // Log each error individually for better visibility
+          data.errors.forEach((err, index) => {
+            console.error(`  Error ${index + 1}:`, err);
+          });
+        }
+
+        throw error;
       }
       return data;
     } catch (error) {
@@ -163,8 +177,6 @@ class ApiService {
   }
 
   async   confirmPayment(id) {
-    console.log('🔍 [API] confirmPayment called with ID:', id, typeof id);
-    console.log('🔍 [API] confirmPayment URL:', `/admin/invoices/${id}/confirm-payment`);
     return this.request(`/admin/invoices/${id}/confirm-payment`, {
       method: 'PUT'
     });
@@ -267,6 +279,29 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify({ role }),
     });
+  }
+
+  // Deliverables management
+  async getAllDeliverables(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/admin/deliverables?${queryString}`);
+  }
+
+  async createDeliverable(deliverableData) {
+    return this.request('/admin/deliverables', {
+      method: 'POST',
+      body: JSON.stringify(deliverableData),
+    });
+  }
+
+  async deleteDeliverable(id) {
+    return this.request(`/admin/deliverables/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getUserDeliverables() {
+    return this.request('/user/deliverables');
   }
 
   // Subscription management
@@ -390,6 +425,45 @@ class ApiService {
 
   async getThumbnailUrl(id, size = 300) {
     return this.request(`/photos/${id}/thumbnail?size=${size}`);
+  }
+
+  // Blog endpoints
+  async getAllBlogs(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/admin/blogs?${queryString}`);
+  }
+
+  async getPublishedBlogs(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/blogs/published?${queryString}`);
+  }
+
+  async getBlogBySlug(slug) {
+    return this.request(`/blogs/${slug}`);
+  }
+
+  async createBlog(blogData) {
+    return this.request('/admin/blogs', {
+      method: 'POST',
+      body: JSON.stringify(blogData),
+    });
+  }
+
+  async updateBlog(id, blogData) {
+    return this.request(`/admin/blogs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(blogData),
+    });
+  }
+
+  async deleteBlog(id) {
+    return this.request(`/blogs/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getBlogStats() {
+    return this.request('/blogs/admin/stats');
   }
 
 }

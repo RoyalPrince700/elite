@@ -34,43 +34,53 @@ import lAfter from "../assets/l-after.jpg";
 const servicesData = [
   {
     title: "Natural Retouching",
-    description: "Subtle enhancements that maintain the authentic look of your photos while improving skin texture, color balance, and overall appeal.",
+    description: "For photographers who want clean, realistic, true-to-life images.",
     icon: FiImage,
     beforeImage: aBefore,
     afterImage: aAfter,
     features: [
-      "Skin smoothing and texture enhancement",
-      "Color correction and white balance",
-      "Background cleanup",
-      "Natural shadow and lighting adjustments"
+      "Maintains real skin texture",
+      "Light blemish correction",
+      "Subtle color & tone enhancement",
+      "No over-editing or plastic look",
+      "Perfect for weddings & lifestyle images, infant images",
+      "Fast delivery",
+      "Best For: Photographers who value authentic beauty and natural expression"
     ],
     popular: false
   },
   {
     title: "High-End Retouching",
-    description: "Professional-grade retouching for fashion, beauty, and commercial photography with meticulous attention to detail.",
+    description: "For clients who need refined beauty without looking overly edited.",
     icon: FiStar,
     beforeImage: bBefore,
     afterImage: bAfter,
     features: [
-      "Advanced skin retouching",
-      "Complex background removal",
-      "Product enhancement",
-      "Commercial-ready quality"
+      "Advanced dodge & burn",
+      "Sculpted light and shadow shaping",
+      "Clean skin work while keeping pores visible",
+      "Makeup and facial detail refinement",
+      "Balanced color grading",
+      "Strong but realistic visual impact",
+      "Best For: Beauty photographers, portrait studios, maternity shoots, commercial creatives"
     ],
     popular: true
   },
   {
-    title: "Magazine Style",
-    description: "Editorial-style retouching for magazines, advertisements, and high-profile campaigns requiring flawless results.",
+    title: "Magazine Retouch",
+    description: "Our signature elite finish — made for print, campaigns & luxury brands.",
     icon: FiAward,
     beforeImage: cBefore,
     afterImage: cAfter,
     features: [
-      "Editorial beauty standards",
-      "Complex composite work",
-      "Brand-specific requirements",
-      "Print-ready optimization"
+      "Pixel-level perfection",
+      "High-end frequency separation workflow",
+      "Hair reconstruction & cleanup",
+      "Advanced skin and texture rebuilding",
+      "Background manipulation",
+      "Editorial color grading",
+      "Built for zoom-in inspection & print detail",
+      "Best For: Fashion editorials, ad campaigns, beauty brands, luxury clients"
     ],
     popular: false
   }
@@ -144,7 +154,7 @@ const additionalServices = [
     description: "All edited photos include full commercial usage rights",
     icon: FiZap
   }
-];
+  ];
 
 // Carousel Component
 const ImageCarousel = () => {
@@ -301,6 +311,126 @@ const ImageCarousel = () => {
   );
 };
 
+export const OurServicesSection = () => {
+  const navigate = useNavigate();
+
+  return (
+    <section className="py-24 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-4xl font-bold text-blue-900 mb-4">Our Services</h2>
+          <p className="text-blue-700 text-lg">
+            Choose the perfect retouching style for your project. Each service is tailored to deliver
+            exceptional results that exceed your expectations.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+          {servicesData.map((service, index) => (
+            <div key={index} className="space-y-6">
+              {/* Before/After Comparison */}
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.8,
+                  delay: index * 0.15 + 0.2,
+                  ease: "easeOut"
+                }}
+                className="relative"
+              >
+                <BeforeAfterComparison
+                  beforeImage={service.beforeImage}
+                  afterImage={service.afterImage}
+                  altText={service.title}
+                />
+              </motion.div>
+
+              {/* Service Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 50, rotateY: -15 }}
+                animate={{ opacity: 1, y: 0, rotateY: 0 }}
+                transition={{
+                  duration: 0.8,
+                  delay: index * 0.15,
+                  ease: "easeOut"
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 5,
+                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                }}
+                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-blue-200 relative group"
+              >
+                {/* Background Hover Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                {/* Animated Background Elements */}
+                <motion.div
+                  className="absolute top-4 right-4 w-20 h-20 bg-blue-100 rounded-full opacity-20"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                ></motion.div>
+
+                <motion.div
+                  className="absolute bottom-4 left-4 w-16 h-16 bg-amber-100 rounded-full opacity-15"
+                  animate={{
+                    scale: [1.2, 1, 1.2],
+                    rotate: [360, 180, 0]
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                ></motion.div>
+
+                {/* Content */}
+                <div className="relative z-10 flex flex-col h-full">
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <service.icon className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-blue-900">{service.title}</h3>
+                    </div>
+
+                    <p className="text-blue-700 mb-4">{service.description}</p>
+
+                    <ul className="space-y-2">
+                      {service.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-start gap-2">
+                          <FiCheck className="mt-1 text-blue-600" />
+                          <span className="text-blue-800 text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => navigate('/pricing')}
+                    className="mt-6 inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white transition-colors"
+                  >
+                    Get Started
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export const Services = () => {
   const navigate = useNavigate();
   const [stackedServices, setStackedServices] = React.useState(additionalServices.map(s => ({ ...s, id: s.title })));
@@ -368,162 +498,7 @@ export const Services = () => {
       </section>
 
       {/* Our Services Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-bold text-blue-900 mb-4">Our Services</h2>
-            <p className="text-blue-700 text-lg">
-              Choose the perfect retouching style for your project. Each service is tailored to deliver
-              exceptional results that exceed your expectations.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-            {servicesData.map((service, index) => (
-              <div key={index} className="space-y-6">
-                {/* Before/After Comparison */}
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: index * 0.15 + 0.2,
-                    ease: "easeOut"
-                  }}
-                  className="relative"
-                >
-                  <BeforeAfterComparison
-                    beforeImage={service.beforeImage}
-                    afterImage={service.afterImage}
-                    altText={service.title}
-                  />
-                </motion.div>
-
-                {/* Service Card */}
-                <motion.div
-                initial={{ opacity: 0, y: 50, rotateY: -15 }}
-                animate={{ opacity: 1, y: 0, rotateY: 0 }}
-                transition={{
-                  duration: 0.8,
-                  delay: index * 0.15,
-                  ease: "easeOut"
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  rotateY: 5,
-                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
-                }}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-blue-200 relative group"
-              >
-                {/* Background Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                {/* Animated Background Elements */}
-                <motion.div
-                  className="absolute top-4 right-4 w-20 h-20 bg-blue-100 rounded-full opacity-20"
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 180, 360]
-                  }}
-                  transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                ></motion.div>
-
-                <motion.div
-                  className="absolute bottom-4 left-4 w-16 h-16 bg-amber-100 rounded-full opacity-15"
-                  animate={{
-                    scale: [1.2, 1, 1.2],
-                    rotate: [360, 180, 0]
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                ></motion.div>
-
-                {service.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="inline-flex text-sm px-4 py-1.5 rounded-xl bg-blue-100 border border-blue-300">
-                      <motion.span
-                        animate={{
-                          backgroundPositionX: "100%",
-                        }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                          repeatType: "loop",
-                        }}
-                        className="bg-[linear-gradient(to_right,#3B82F6,#60A5FA,#93C5FD,#3B82F6)] [background-size:200%] text-transparent bg-clip-text font-medium"
-                      >
-                        Most Popular
-                      </motion.span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="text-center mb-6 relative z-10">
-                  <motion.div
-                    className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4"
-                    whileHover={{
-                      scale: 1.2,
-                      rotate: 360,
-                      backgroundColor: "#3B82F6"
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <motion.div
-                      animate={{
-                        rotate: [0, 10, -10, 0]
-                      }}
-                      transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      <service.icon className="w-8 h-8 text-blue-700 group-hover:text-white transition-colors duration-300" />
-                    </motion.div>
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-blue-900 mb-2">{service.title}</h3>
-                  <p className="text-blue-700">{service.description}</p>
-                </div>
-
-                <ul className="space-y-3 relative z-10">
-                  {service.features.map((feature, idx) => (
-                    <motion.li
-                      key={idx}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.15 + idx * 0.1 }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-start gap-3"
-                    >
-                      <motion.div
-                        className="p-1 rounded-full mt-1 flex-shrink-0 bg-blue-100"
-                        whileHover={{
-                          scale: 1.3,
-                          backgroundColor: "#3B82F6"
-                        }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <FiCheck className="h-4 w-4 text-blue-700" />
-                      </motion.div>
-                      <span className="text-blue-800 text-sm">{feature}</span>
-                    </motion.li>
-                  ))}
-                </ul>
-              </motion.div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <OurServicesSection />
 
       {/* Why Choose Us Section - Stacked Cards */}
       <section className="py-24 bg-gradient-to-br from-blue-50 to-white relative">

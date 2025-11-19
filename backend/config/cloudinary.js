@@ -32,6 +32,18 @@ const editedPhotoStorage = new CloudinaryStorage({
   }
 });
 
+// Storage engine for blog header images
+const blogHeaderStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'eliteretoucher/blog/headers',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [
+      { width: 1600, height: 900, crop: 'limit', quality: 'auto', fetch_format: 'auto' }
+    ]
+  }
+});
+
 // Create multer upload middleware for photos
 export const upload = multer({
   storage: photoStorage,
@@ -85,6 +97,21 @@ export const uploadEdited = multer({
       cb(null, true);
     } else {
       cb(new Error('Only image files are allowed for edited photos!'), false);
+    }
+  }
+});
+
+// Create multer upload middleware for blog headers
+export const uploadBlogHeader = multer({
+  storage: blogHeaderStorage,
+  limits: {
+    fileSize: 8 * 1024 * 1024 // 8MB limit for headers
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed for blog headers!'), false);
     }
   }
 });

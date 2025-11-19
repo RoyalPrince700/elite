@@ -17,9 +17,24 @@ import {
   updateSubscription,
   getAllPhotos,
   updatePhotoStatus,
-  getPhotoStats
+  getPhotoStats,
+  getAllDeliverables,
+  createDeliverable,
+  deleteDeliverable,
+  getUserDeliverables
 } from '../controllers/adminController.js';
+import {
+  getAllBlogs,
+  createBlog,
+  updateBlog,
+  deleteBlog,
+  publishBlog,
+  unpublishBlog,
+  getBlogStats
+} from '../controllers/blogController.js';
 import { fixNextBillingDates, confirmPayment } from '../controllers/subscriptionController.js';
+import { uploadBlogHeader } from '../config/cloudinary.js';
+import { validateBlogCreation, validateBlogUpdate } from '../middleware/validators/blogValidators.js';
 
 const router = express.Router();
 
@@ -68,5 +83,29 @@ router.post('/subscriptions/fix-next-billing-dates', fixNextBillingDates);
 router.get('/photos', getAllPhotos);
 router.put('/photos/:id/status', updatePhotoStatus);
 router.get('/photos/stats', getPhotoStats);
+
+// Blog management
+router.get('/blogs', getAllBlogs);
+router.get('/blogs/stats', getBlogStats);
+router.post(
+  '/blogs',
+  uploadBlogHeader.single('headerImage'),
+  validateBlogCreation,
+  createBlog
+);
+router.put(
+  '/blogs/:id',
+  uploadBlogHeader.single('headerImage'),
+  validateBlogUpdate,
+  updateBlog
+);
+router.delete('/blogs/:id', deleteBlog);
+router.put('/blogs/:id/publish', publishBlog);
+router.put('/blogs/:id/unpublish', unpublishBlog);
+
+// Deliverables management
+router.get('/deliverables', getAllDeliverables);
+router.post('/deliverables', createDeliverable);
+router.delete('/deliverables/:id', deleteDeliverable);
 
 export default router;

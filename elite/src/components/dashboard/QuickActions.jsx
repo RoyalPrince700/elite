@@ -81,7 +81,7 @@ const QuickActions = ({ subscriptions = [], onPhotoUpload }) => {
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Quick Actions</h2>
+        <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-6">Quick Actions</h2>
 
         <div className="space-y-3">
           <button

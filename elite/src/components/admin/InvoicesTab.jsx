@@ -30,7 +30,7 @@ const InvoicesTab = ({
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <FaFileInvoiceDollar className="text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-base font-semibold text-gray-900">
                       Invoice #{invoice.invoiceNumber || invoice._id.slice(-8)}
                     </h3>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(invoice.status)}`}>

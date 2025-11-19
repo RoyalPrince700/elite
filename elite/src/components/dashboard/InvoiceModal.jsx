@@ -47,7 +47,7 @@ const InvoiceModal = ({
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Invoice Details</h2>
+            <h2 className="text-xl font-bold text-gray-900">Invoice Details</h2>
               <p className="text-gray-600 mt-1">Invoice #{selectedInvoice.invoiceNumber || selectedInvoice._id.slice(-8)}</p>
             </div>
             <button
@@ -66,7 +66,7 @@ const InvoiceModal = ({
                 <p className="text-blue-700 text-sm">Due by {new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-blue-900">
+              <p className="text-2xl font-bold text-blue-900">
                   {selectedInvoice.currency === 'NGN' ? `₦${selectedInvoice.amount.toLocaleString()}` : `$${selectedInvoice.amount}`}
                 </p>
                 <p className={`text-sm px-3 py-1 rounded-full font-medium ${getStatusColor(selectedInvoice.status)}`}>
@@ -80,7 +80,7 @@ const InvoiceModal = ({
 
           {/* Payment Details */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Payment Details</h3>
+            <h3 className="text-base font-medium text-gray-900 mb-3">Payment Details</h3>
 
 
             {selectedInvoice.paymentDetails && hasValidPaymentDetails(selectedInvoice.paymentDetails) ? (
@@ -135,7 +135,7 @@ const InvoiceModal = ({
           {/* Payment Instructions */}
           {selectedInvoice.paymentInstructions && (
             <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Payment Instructions</h3>
+              <h3 className="text-base font-medium text-gray-900 mb-3">Payment Instructions</h3>
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <p className="text-gray-700">{selectedInvoice.paymentInstructions}</p>
               </div>
@@ -145,7 +145,7 @@ const InvoiceModal = ({
           {/* Invoice Items */}
           {selectedInvoice.invoiceItems && selectedInvoice.invoiceItems.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Invoice Items</h3>
+              <h3 className="text-base font-medium text-gray-900 mb-3">Invoice Items</h3>
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 {selectedInvoice.invoiceItems.map((item, index) => (
                   <div key={index} className="flex justify-between items-center py-2">

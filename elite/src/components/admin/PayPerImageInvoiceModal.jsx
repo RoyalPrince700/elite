@@ -19,7 +19,7 @@ const PayPerImageInvoiceModal = ({
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Send Pay-Per-Image Invoice</h2>
+              <h2 className="text-xl font-bold text-gray-900">Send Pay-Per-Image Invoice</h2>
               <p className="text-gray-600 mt-1">Enter payment details for {selectedRequest.companyName}</p>
             </div>
             <button
@@ -41,7 +41,7 @@ const PayPerImageInvoiceModal = ({
                 <p className="text-blue-700 text-sm">Quantity: {selectedRequest.quantity}</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-blue-900">
+                <p className="text-xl font-bold text-blue-900">
                   {selectedRequest.currency === 'NGN' ? `₦${selectedRequest.totalPrice.toLocaleString()}` : `$${selectedRequest.totalPrice}`}
                 </p>
                 <p className="text-blue-700 text-sm">Total Price</p>
@@ -68,7 +68,7 @@ const PayPerImageInvoiceModal = ({
 
             {/* Payment Details */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Payment Details</h3>
+              <h3 className="text-base font-medium text-gray-900">Payment Details</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
