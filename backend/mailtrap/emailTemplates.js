@@ -980,7 +980,7 @@ export const emailTemplates = {
         <div class="container">
           <div class="header">
             <h1 style="margin:0; font-size:24px;">📦 New Deliverable Available!</h1>
-            <p style="margin:8px 0 0 0; opacity:0.9;">your retouch images is ready for download</p>
+            <p style="margin:8px 0 0 0; opacity:0.9;">your retouched images are ready for download</p>
           </div>
           <div class="content">
             <p>Hi ${firstName},</p>
