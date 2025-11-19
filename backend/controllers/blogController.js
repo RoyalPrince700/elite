@@ -3,6 +3,7 @@ import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js';
 import Like from '../models/Like.js';
 import cacheService, { CACHE_KEYS } from '../services/cacheService.js';
+import { cloudinaryUtils } from '../config/cloudinary.js';
 
 const { ObjectId } = mongoose.Types;
 
@@ -709,6 +710,69 @@ export const getBlogStats = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch blog statistics'
+    });
+  }
+};
+
+// @desc    Upload general image for blog content
+// @route   POST /api/blog/upload-image
+// @access  Private (Admin only)
+export const uploadBlogImage = async (req, res) => {
+  try {
+    console.log('🔄 [BlogController] ===== BLOG IMAGE UPLOAD REQUEST =====');
+    console.log('🔄 [BlogController] File received:', req.file ? req.file.originalname : 'none');
+
+    if (!req.file) {
+      console.log('❌ [BlogController] No file found in req.file');
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    console.log(`🔄 [BlogController] Uploading file: ${req.file.originalname}`);
+
+    // Upload to Cloudinary manually with timeout
+    const cloudinaryUploadPromise = cloudinaryUtils.uploadBuffer(req.file.buffer, {
+      folder: 'eliteretoucher/blog/images',
+      public_id: `blog-image-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${req.file.originalname.split('.')[0]}`,
+      resource_type: 'auto'
+    });
+
+    // Dynamic timeout based on file size (minimum 30 seconds, maximum 5 minutes)
+    const fileSizeMB = req.file.size / (1024 * 1024);
+    const timeoutMs = Math.max(30000, Math.min(300000, fileSizeMB * 10000)); // 10 seconds per MB, min 30s, max 5min
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Upload timeout for ${req.file.originalname} (${Math.round(timeoutMs/1000)}s)`)), timeoutMs)
+    );
+
+    const cloudinaryResult = await Promise.race([cloudinaryUploadPromise, timeoutPromise]);
+
+    console.log(`✅ [BlogController] Cloudinary upload successful for ${req.file.originalname}`);
+
+    // Additional validation for Cloudinary-specific errors
+    if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+      throw new Error('Cloudinary upload failed: Invalid response from Cloudinary');
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        url: cloudinaryResult.secure_url,
+        publicId: cloudinaryResult.public_id,
+        format: cloudinaryResult.format,
+        width: cloudinaryResult.width,
+        height: cloudinaryResult.height,
+        bytes: cloudinaryResult.bytes
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ [BlogController] Error uploading blog image:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to upload image'
     });
   }
 };

@@ -2,7 +2,7 @@ import SubscriptionRequest from '../models/SubscriptionRequest.js';
 import Invoice from '../models/Invoice.js';
 import PaymentReceipt from '../models/PaymentReceipt.js';
 import User from '../models/User.js';
-import { sendInvoiceEmail } from '../mailtrap/emails.js';
+import { sendInvoiceEmail, sendDeliverableNotificationEmail } from '../mailtrap/emails.js';
 import Subscription from '../models/Subscription.js';
 import SubscriptionPlan from '../models/SubscriptionPlan.js';
 import PayPerImage from '../models/PayPerImage.js';
@@ -1127,6 +1127,29 @@ export const createDeliverable = async (req, res) => {
     // Populate the deliverable with user and creator info
     await deliverable.populate('userId', 'fullName email companyName');
     await deliverable.populate('createdBy', 'fullName email');
+
+    // Send email notification to user (non-blocking for API response)
+    try {
+      const emailData = {
+        userFullName: deliverable.userId.fullName || 'Customer',
+        title: deliverable.title,
+        description: deliverable.description,
+        downloadUrl: deliverable.link,
+        dashboardUrl: 'https://www.eliteretoucher.com/dashboard?tab=downloads',
+        adminName: deliverable.createdBy?.fullName || 'Admin',
+        createdAt: deliverable.createdAt
+      };
+
+      const userEmail = deliverable?.userId?.email;
+      if (userEmail) {
+        await sendDeliverableNotificationEmail(userEmail, emailData);
+      } else {
+        console.warn('Deliverable created but user email not found for deliverable:', deliverable._id);
+      }
+    } catch (emailError) {
+      console.error('Error sending deliverable notification email:', emailError);
+      // Don't fail the API call if email fails
+    }
 
     res.status(201).json({
       success: true,

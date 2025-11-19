@@ -930,6 +930,109 @@ export const emailTemplates = {
   },
 
   /**
+   * Deliverables notification email template
+   * @param {Object} data
+   * @param {string} data.userFullName - User's full name
+   * @param {string} data.title - Deliverable title
+   * @param {string} data.description - Deliverable description
+   * @param {string} data.downloadUrl - Direct download link
+   * @param {string} data.dashboardUrl - Dashboard URL with downloads tab
+   * @param {string} [data.adminName] - Admin who created the deliverable
+   * @param {Date|string} [data.createdAt] - When deliverable was created
+   * @returns {Object}
+   */
+  deliverablesNotification: (data = {}) => {
+    const {
+      userFullName = 'Customer',
+      title = 'Your Deliverable',
+      description = '',
+      downloadUrl = '#',
+      dashboardUrl = 'https://www.eliteretoucher.com/dashboard?tab=downloads',
+      adminName = 'Admin',
+      createdAt
+    } = data || {};
+
+    const firstName = (userFullName || '').split(' ')[0] || 'there';
+    const subject = `New Deliverable Available: ${title}`;
+    const createdDisplay = createdAt ? new Date(createdAt).toLocaleDateString() : new Date().toLocaleDateString();
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Deliverable Available</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a; background:#f1f5f9; }
+          .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+          .header { background: #0ea5e9; color: white; padding: 28px; text-align: center; border-radius: 12px 12px 0 0; }
+          .content { background: #ffffff; padding: 24px; border-radius: 0 0 12px 12px; box-shadow: 0 1px 3px rgba(15,23,42,0.08); }
+          .deliverable-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 20px 0; background: #f8fafc; }
+          .button { display: inline-block; background: #0ea5e9; color: #ffffff !important; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 12px 6px 0 0; font-weight: 600; text-align: center; }
+          .secondary-button { background: #64748b; }
+          .meta { font-size: 12px; color: #64748b; margin-top: 8px; }
+          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 12px; }
+          .download-icon { display: inline-block; margin-right: 8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0; font-size:24px;">📦 New Deliverable Available!</h1>
+            <p style="margin:8px 0 0 0; opacity:0.9;">your retouch images is ready for download</p>
+          </div>
+          <div class="content">
+            <p>Hi ${firstName},</p>
+            <p>Great news! Your deliverable has been added to your Download Center.</p>
+
+            <div class="deliverable-card">
+              <h3 style="margin:0 0 8px 0; color:#0f172a; font-size:18px;">${title}</h3>
+              ${description ? `<p style="margin:0 0 12px 0; color:#475569;">${description}</p>` : ''}
+              <div class="meta">
+                Added on ${createdDisplay} by ${adminName}
+              </div>
+            </div>
+
+            <p>Access your deliverable through your dashboard:</p>
+
+            <a href="${dashboardUrl}" class="button secondary-button">
+              View in Dashboard
+            </a>
+
+            <p style="margin-top:16px; color:#334155; font-size:14px;">
+              Your downloads are securely stored and available anytime. Check your Download Center for all your completed work.
+            </p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const text = [
+      `Hi ${firstName},`,
+      '',
+      'Great news! Your deliverable has been added to your Download Center.',
+      '',
+      `Title: ${title}`,
+      description ? `Description: ${description}` : '',
+      `Added on: ${createdDisplay} by ${adminName}`,
+      '',
+      'View in your dashboard:',
+      dashboardUrl,
+      '',
+      'Your downloads are securely stored and available anytime.',
+      '',
+      `© ${new Date().getFullYear()} Elite Retoucher. All rights reserved.`
+    ].filter(Boolean).join('\n');
+
+    return { subject, html, text };
+  },
+
+  /**
    * Chat: Notify user about a new admin message
    * @param {Object} data
    * @param {string} data.adminFullName

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { FaCamera, FaHistory, FaFileInvoiceDollar, FaDownload, FaUpload, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCamera, FaDownload, FaUpload, FaExclamationTriangle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
-const QuickActions = ({ subscriptions = [], onPhotoUpload }) => {
+const QuickActions = ({ subscriptions = [], onPhotoUpload, onDownloadCenterClick }) => {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
@@ -129,23 +129,10 @@ const QuickActions = ({ subscriptions = [], onPhotoUpload }) => {
             }`} />
           </button>
 
-          <button className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
-              <FaHistory className="text-green-600 flex-shrink-0" />
-              <span className="font-medium text-gray-900 text-sm md:text-base truncate">View Order History</span>
-            </div>
-            <FaHistory className="text-gray-400 flex-shrink-0" />
-          </button>
-
-          <button className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
-              <FaFileInvoiceDollar className="text-purple-600 flex-shrink-0" />
-              <span className="font-medium text-gray-900 text-sm md:text-base truncate">View Invoices</span>
-            </div>
-            <FaFileInvoiceDollar className="text-gray-400 flex-shrink-0" />
-          </button>
-
-          <button className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <button
+            onClick={onDownloadCenterClick}
+            className="w-full flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
             <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
               <FaDownload className="text-indigo-600 flex-shrink-0" />
               <span className="font-medium text-gray-900 text-sm md:text-base truncate">Download Center</span>

@@ -8,7 +8,8 @@ import {
   deleteBlog,
   publishBlog,
   unpublishBlog,
-  getBlogStats
+  getBlogStats,
+  uploadBlogImage
 } from '../controllers/blogController.js';
 import {
   getCommentsByBlog,
@@ -25,7 +26,7 @@ import {
 } from '../controllers/likeController.js';
 import { authenticateToken, optionalAuth, requireAdmin } from '../middleware/auth.js';
 import { validateBlogCreation, validateBlogUpdate } from '../middleware/validators/blogValidators.js';
-import { uploadBlogHeader } from '../config/cloudinary.js';
+import { uploadBlogHeader, upload } from '../config/cloudinary.js';
 
 const router = express.Router();
 
@@ -35,6 +36,7 @@ router.get('/', getPublishedBlogs);
 // Admin blog management
 router.get('/admin/all', authenticateToken, requireAdmin, getAllBlogs);
 router.get('/admin/stats', authenticateToken, requireAdmin, getBlogStats);
+router.post('/upload-image', authenticateToken, requireAdmin, upload.single('image'), uploadBlogImage);
 router.post(
   '/',
   authenticateToken,

@@ -276,6 +276,18 @@ class BlogService {
     }
   }
 
+  async uploadBlogImage(formData) {
+    try {
+      return await apiService.request(`${this.baseURL}/upload-image`, {
+        method: 'POST',
+        body: formData
+      });
+    } catch (error) {
+      console.error('❌ [BlogService] Failed to upload blog image:', error);
+      throw error;
+    }
+  }
+
   // Utility methods
   calculateReadingTime(content) {
     if (!content) return 0;

@@ -1,11 +1,11 @@
 import 'dotenv/config';
-import { sendWelcomeEmail, sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendInvoiceEmail, sendSubscriptionActivatedEmail, sendChatNotificationToUser, sendChatNotificationToAdmin, sendPayPerImageActivatedEmail } from '../mailtrap/emails.js';
+import { sendWelcomeEmail, sendSubscriptionRequestReceiptEmail, sendAdminNotificationEmail, sendInvoiceEmail, sendSubscriptionActivatedEmail, sendChatNotificationToUser, sendChatNotificationToAdmin, sendPayPerImageActivatedEmail, sendDeliverableNotificationEmail } from '../mailtrap/emails.js';
 
 function parseArgs(argv) {
   const args = {
     to: 'test@example.com',
     name: 'Test User',
-    template: 'subscription', // subscription | welcome | admin | invoice | activated | chat-user | chat-admin | ppi-activated
+    template: 'subscription', // subscription | welcome | admin | invoice | activated | chat-user | chat-admin | ppi-activated | deliverables
     plan: 'Gold Plan',
     cycle: 'monthly', // monthly | yearly
     amount: '197',
@@ -301,6 +301,24 @@ async function main() {
         unitPrice: uNum,
         totalPrice: tNum,
         activatedAt: new Date().toISOString()
+      });
+    } else if (template === 'deliverables') {
+      console.log('📧 Testing Mailtrap deliverables notification email...');
+      console.log('  → Recipient   :', to);
+      console.log('  → Name        :', name);
+      console.log('  → Title       :', plan || 'Sample Deliverable');
+      console.log('  → Description :', msg || 'This is a sample deliverable description.');
+      console.log('  → Download URL:', dashboardUrl || 'https://example.com/download/sample-file.zip');
+      console.log('  → Admin Name  :', admin || 'Admin User');
+
+      await sendDeliverableNotificationEmail(to, {
+        userFullName: name,
+        title: plan || 'Sample Deliverable',
+        description: msg || 'This is a sample deliverable description.',
+        downloadUrl: dashboardUrl || 'https://example.com/download/sample-file.zip',
+        dashboardUrl: 'https://www.eliteretoucher.com/dashboard?tab=downloads',
+        adminName: admin || 'Admin User',
+        createdAt: new Date().toISOString()
       });
     } else {
       console.log('📧 Testing Mailtrap welcome email...');

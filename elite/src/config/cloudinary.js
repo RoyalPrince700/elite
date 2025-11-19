@@ -96,5 +96,5 @@ export const deleteFromCloudinary = async (publicId) => {
   // This would require server-side implementation with API secret
   // For now, we'll handle deletion through the admin panel
 };
-
 export default cloudinary;
+

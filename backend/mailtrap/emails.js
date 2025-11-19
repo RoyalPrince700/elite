@@ -135,6 +135,24 @@ export const sendPayPerImageActivatedEmail = async (userEmail, data = {}) => {
 };
 
 /**
+ * Send deliverable notification email to user
+ * @param {string} userEmail - User's email address
+ * @param {Object} data - Deliverable data
+ * @param {string} data.userFullName - User's full name
+ * @param {string} data.title - Deliverable title
+ * @param {string} data.description - Deliverable description
+ * @param {string} data.downloadUrl - Direct download link
+ * @param {string} [data.dashboardUrl] - Dashboard URL with downloads tab
+ * @param {string} [data.adminName] - Admin who created the deliverable
+ * @param {Date|string} [data.createdAt] - When deliverable was created
+ * @returns {Promise<Object>} - Mailtrap response
+ */
+export const sendDeliverableNotificationEmail = async (userEmail, data = {}) => {
+  const { subject, html, text } = emailTemplates.deliverablesNotification(data);
+  return await sendEmail(userEmail, subject, html, text);
+};
+
+/**
  * Send chat notification to admin when user sends a message
  * @param {string} adminEmail
  * @param {Object} data - { userFullName, userEmail, messageText, chatId, dashboardUrl, sentAt }

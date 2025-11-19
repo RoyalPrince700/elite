@@ -22,6 +22,7 @@ import PayPerImageInvoiceModal from '../components/admin/PayPerImageInvoiceModal
 import ChatTab from '../components/admin/ChatTab';
 import BlogTab from '../components/admin/BlogTab';
 import BlogFormModal from '../components/admin/BlogFormModal';
+import ImageUploadModal from '../components/admin/ImageUploadModal';
 import { useSocket } from '../context/SocketContext';
 import { chatService } from '../services/chatService';
 
@@ -42,7 +43,8 @@ import {
   FaFilter,
   FaUser,
   FaTimes,
-  FaBars
+  FaBars,
+  FaLink
 } from 'react-icons/fa';
 
 const AdminDashboard = () => {
@@ -100,6 +102,7 @@ const AdminDashboard = () => {
   const [showBlogModal, setShowBlogModal] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [savingBlog, setSavingBlog] = useState(false);
+  const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [deliverables, setDeliverables] = useState([]);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
   const [selectedUserForDeliverable, setSelectedUserForDeliverable] = useState(null);
@@ -978,14 +981,21 @@ const AdminDashboard = () => {
 
                     {activeTab === 'blog' && (
                       <div>
-                        {/* Create Blog Button */}
-                        <div className="mb-6">
+                        {/* Action Buttons */}
+                        <div className="mb-6 flex flex-wrap gap-3">
                           <button
                             onClick={handleCreateBlog}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center space-x-2"
                           >
                             <FaEdit />
                             <span>Create New Blog Post</span>
+                          </button>
+                          <button
+                            onClick={() => setShowImageUploadModal(true)}
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors flex items-center space-x-2"
+                          >
+                            <FaLink />
+                            <span>Image Link</span>
                           </button>
                         </div>
 
@@ -1044,6 +1054,12 @@ const AdminDashboard = () => {
         selectedUser={selectedUserForDeliverable}
         onSave={handleSaveDeliverable}
         saving={savingDeliverable}
+      />
+
+      {/* Image Upload Modal */}
+      <ImageUploadModal
+        showModal={showImageUploadModal}
+        setShowModal={setShowImageUploadModal}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/api';
 import { toast } from 'react-toastify';
@@ -27,6 +27,7 @@ import {
 
 const Dashboard = () => {
   const { user, subscription, subscriptions, refreshSubscription } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Wrapper function to refresh subscriptions
   const handleRefreshSubscriptions = async () => {
@@ -64,7 +65,7 @@ const Dashboard = () => {
   const [deliverables, setDeliverables] = useState([]);
 
   // Sidebar state
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -78,6 +79,16 @@ const Dashboard = () => {
       refreshSubscription();
     }
   }, [refreshSubscription, user]); // Safe to include these as user changes infrequently
+
+  // Update activeTab when URL parameters change
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    } else {
+      setActiveTab('overview');
+    }
+  }, [searchParams]);
 
   const fetchDashboardData = async () => {
     try {
@@ -274,6 +285,13 @@ const Dashboard = () => {
   // Sidebar handlers
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
+    // Update URL parameters
+    if (tabId === 'overview') {
+      // Remove tab parameter for overview (default)
+      setSearchParams({});
+    } else {
+      setSearchParams({ tab: tabId });
+    }
   };
 
   const handleMobileSidebarToggle = () => {
@@ -285,7 +303,10 @@ const Dashboard = () => {
     <div className="space-y-8">
       {/* Quick Actions - Moved to top for better mobile UX */}
       <div>
-        <QuickActions subscriptions={subscriptions} />
+        <QuickActions
+          subscriptions={subscriptions}
+          onDownloadCenterClick={() => handleTabChange('downloads')}
+        />
       </div>
 
       {/* Stats Cards */}
@@ -315,40 +336,6 @@ const Dashboard = () => {
     </div>
   );
 
-  const renderOrdersTab = () => (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Order History</h2>
-        <RecentOrders recentOrders={recentOrders} />
-      </div>
-
-      {/* Full Subscription & Billing Section */}
-      <SubscriptionBilling
-        subscriptions={subscriptions}
-        invoices={invoices}
-        paymentReceipts={paymentReceipts}
-        onViewInvoice={handleViewInvoice}
-        onPaymentStatusUpdate={handlePaymentStatusUpdate}
-        onRefreshSubscriptions={handleRefreshSubscriptions}
-      />
-    </div>
-  );
-
-  const renderInvoicesTab = () => (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Invoices & Billing</h2>
-        <SubscriptionBilling
-          subscriptions={subscriptions}
-          invoices={invoices}
-          paymentReceipts={paymentReceipts}
-          onViewInvoice={handleViewInvoice}
-          onPaymentStatusUpdate={handlePaymentStatusUpdate}
-          onRefreshSubscriptions={handleRefreshSubscriptions}
-        />
-      </div>
-    </div>
-  );
 
   const renderDownloadsTab = () => (
     <div className="max-w-4xl mx-auto">
@@ -422,6 +409,42 @@ const Dashboard = () => {
 
 
 
+
+  // Render active tab content
+  const renderOrdersTab = () => (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Order History</h2>
+        <RecentOrders recentOrders={recentOrders} />
+      </div>
+
+      {/* Full Subscription & Billing Section */}
+      <SubscriptionBilling
+        subscriptions={subscriptions}
+        invoices={invoices}
+        paymentReceipts={paymentReceipts}
+        onViewInvoice={handleViewInvoice}
+        onPaymentStatusUpdate={handlePaymentStatusUpdate}
+        onRefreshSubscriptions={handleRefreshSubscriptions}
+      />
+    </div>
+  );
+
+  const renderInvoicesTab = () => (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Invoices & Billing</h2>
+        <SubscriptionBilling
+          subscriptions={subscriptions}
+          invoices={invoices}
+          paymentReceipts={paymentReceipts}
+          onViewInvoice={handleViewInvoice}
+          onPaymentStatusUpdate={handlePaymentStatusUpdate}
+          onRefreshSubscriptions={handleRefreshSubscriptions}
+        />
+      </div>
+    </div>
+  );
 
   // Render active tab content
   const renderActiveTab = () => {
